@@ -233,29 +233,30 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
               marginTop: '28px',
             }}
             initial={{ width: 0 }}
-            animate={showDivider ? { width: 340 } : { width: 0 }}
+            animate={showDivider ? { width: 440 } : { width: 0 }}
             transition={{ duration: 1, ease }}
           />
 
           {/* ── PROGRESS AREA ── */}
           <motion.div
-            style={{ width: 340, marginTop: 18 }}
+            style={{ width: 440, maxWidth: '90vw', marginTop: 18 }}
             initial={{ opacity: 0 }}
             animate={showProgress ? { opacity: 1 } : { opacity: 0 }}
             transition={{ duration: 0.6 }}
           >
             {/* Labels */}
-            <div className="flex justify-between items-center mb-2.5">
+            <div className="flex justify-between items-center mb-3">
               <motion.span
                 animate={{ opacity: [0.4, 1, 0.4] }}
                 transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
                 style={{
                   fontFamily: "'Cinzel', serif",
-                  fontSize: '7px',
-                  fontWeight: 900,
-                  letterSpacing: '4px',
+                  fontSize: 'clamp(7px, 2.5vw, 11px)',
+                  fontWeight: 800,
+                  letterSpacing: 'clamp(1px, 0.6vw, 3px)',
                   color: '#c8a84b',
                   textTransform: 'uppercase',
+                  whiteSpace: 'nowrap',
                 }}
               >
                 Preparing the cinematic experience
@@ -263,11 +264,11 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
               <span
                 style={{
                   fontFamily: "'Cinzel', serif",
-                  fontSize: '14px',
+                  fontSize: 'clamp(14px, 4vw, 20px)',
                   fontWeight: 900,
-                  letterSpacing: '2px',
+                  letterSpacing: '1px',
                   color: progress >= 100 ? '#ffffff' : '#c8a84b',
-                  minWidth: '52px',
+                  minWidth: 'clamp(40px, 10vw, 60px)',
                   textAlign: 'right',
                   transition: 'color 0.3s',
                 }}
@@ -278,10 +279,10 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
 
             {/* Track */}
             <div
-              className="relative overflow-hidden"
+              className="relative overflow-hidden rounded-full"
               style={{
                 width: '100%',
-                height: '2px',
+                height: '4px',
                 background: 'rgba(255,255,255,0.06)',
               }}
             >
@@ -301,9 +302,9 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
               <motion.div
                 style={{
                   position: 'absolute',
-                  top: '-4px',
+                  top: '-3px',
                   left: `calc(${progress}% - 1px)`,
-                  width: '3px',
+                  width: '4px',
                   height: '10px',
                   background: '#c8a84b',
                   boxShadow:

@@ -16,6 +16,7 @@ import Testimonials from './components/Testimonials';
 import Investment from './components/Investment';
 import Careers from './components/Careers';
 import Footer from './components/Footer';
+import AmbientBackground from './components/AmbientBackground';
 
 export default function App() {
   const [loading, setLoading] = useState(true);
@@ -45,6 +46,7 @@ export default function App() {
 
   return (
     <div className="bg-black min-h-screen text-white selection:bg-[#D4AF37] selection:text-black font-sans">
+      <AmbientBackground />
       {loading ? (
         <Preloader onComplete={() => setLoading(false)} />
       ) : (

@@ -16,13 +16,13 @@ export default function Hero() {
         {
           scale: 300,
           force3D: false, // CRITICAL: Prevents the browser from crashing due to massive GPU texture limits
+          ease: "none",
           scrollTrigger: {
             trigger: containerRef.current,
             scrub: 1,
             pin: true,
             start: "top top",
-            end: "+=1500", // Slightly longer scroll for smoother zoom
-            ease: "none"
+            end: "+=1500" // Slightly longer scroll for smoother zoom
           },
         }
       );

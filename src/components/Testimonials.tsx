@@ -54,6 +54,13 @@ export default function Testimonials() {
 
   return (
     <div id="testimonials" ref={containerRef} className="h-screen bg-[#f5f0eb] relative overflow-hidden z-20 flex flex-col items-center justify-center">
+      {/* Background Texture */}
+      <div className="absolute inset-0 pointer-events-none z-0">
+        <div className="absolute inset-0 bg-[#f5f0eb]"></div>
+        <div className="absolute inset-0 opacity-[0.04] mix-blend-multiply bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,_rgba(212,175,55,0.1),_transparent_70%)]"></div>
+      </div>
+
       <div className="absolute top-24 left-0 w-full text-center z-10">
         <h2 className="font-serif text-5xl md:text-7xl text-black">They said <span className="text-[#D4AF37] italic">"yes!"</span></h2>
       </div>

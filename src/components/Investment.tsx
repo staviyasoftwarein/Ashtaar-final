@@ -58,6 +58,13 @@ export default function Investment() {
 
   return (
     <section id="investment" className="relative bg-[#fcfbf9] min-h-screen z-20 overflow-hidden flex">
+      {/* Premium Texture & Lighting */}
+      <div className="absolute inset-0 pointer-events-none z-0">
+        <div className="absolute inset-0 bg-[#fcfbf9]"></div>
+        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.04] mix-blend-multiply"></div>
+        <div className="absolute top-0 right-0 w-[50vw] h-[50vh] bg-[#D4AF37]/5 blur-[120px] rounded-full"></div>
+      </div>
+
       {/* Main List View */}
       <motion.div 
         animate={{ x: selectedTier ? '-100%' : '0%' }}
@@ -116,14 +123,15 @@ export default function Investment() {
       </motion.div>
 
       {/* Slide-in Form View */}
-      <motion.div
-        initial={{ x: '100%' }}
-        animate={{ x: selectedTier ? '0%' : '100%' }}
-        transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1] }}
-        className="absolute top-0 left-0 w-full min-h-screen bg-[#fcfbf9] z-50 flex"
-      >
+      <AnimatePresence>
         {selectedData && (
-          <>
+          <motion.div
+            initial={{ x: '100%' }}
+            animate={{ x: '0%' }}
+            exit={{ x: '100%' }}
+            transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1] }}
+            className="fixed inset-0 w-full h-full bg-[#fcfbf9] z-[100] flex"
+          >
             {/* Left side: Retaining Investment Details */}
             <div className="hidden md:flex w-1/2 relative flex-col justify-center p-16 bg-[#fcfbf9]">
               <div className="max-w-md mx-auto w-full">
@@ -145,7 +153,7 @@ export default function Investment() {
             </div>
 
             {/* Right side: Form */}
-            <div className="w-full md:w-1/2 bg-[#1a0a0a] p-8 md:p-20 overflow-y-auto flex flex-col justify-center relative shadow-2xl">
+            <div className="w-full md:w-1/2 bg-[#1a0a0a] p-8 md:p-20 overflow-y-auto flex flex-col justify-center relative shadow-2xl h-full">
               <button 
                 onClick={() => setSelectedTier(null)}
                 className="absolute top-8 left-8 md:top-12 md:left-12 text-[#fff2f2]/50 hover:text-[#D4AF37] transition-colors flex items-center gap-2 font-sans text-xs uppercase tracking-widest"
@@ -153,8 +161,8 @@ export default function Investment() {
                 <ArrowLeft className="w-4 h-4" /> Back to tiers
               </button>
               
-              <div className="md:hidden mb-12 mt-12">
-                <h2 className="font-serif text-4xl text-[#fff2f2] mb-2">{selectedData.title}</h2>
+              <div className="md:hidden mt-16 mb-8 pt-8">
+                <h2 className="font-serif text-3xl md:text-4xl text-[#fff2f2] mb-2">{selectedData.title}</h2>
                 <p className="text-[#D4AF37] font-serif text-xl italic">{selectedData.price}</p>
               </div>
 
@@ -173,14 +181,14 @@ export default function Investment() {
                   <label className="block text-[10px] uppercase tracking-[0.2em] text-[#fff2f2]/50 mb-3 font-sans">Message / Inquiry</label>
                   <textarea rows={4} className="w-full bg-transparent border-b border-[#fff2f2]/20 py-3 text-[#fff2f2] font-sans text-lg focus:outline-none focus:border-[#D4AF37] transition-colors resize-none"></textarea>
                 </div>
-                <button className="w-full bg-[#D4AF37] text-black px-8 py-5 uppercase tracking-widest text-xs font-bold hover:bg-[#fff2f2] transition-colors mt-8 rounded-lg">
+                <button type="button" className="w-full bg-[#D4AF37] text-black px-8 py-5 uppercase tracking-widest text-xs font-bold hover:bg-[#fff2f2] transition-colors mt-8 rounded-lg">
                   Submit Enquiry
                 </button>
               </form>
             </div>
-          </>
+          </motion.div>
         )}
-      </motion.div>
+      </AnimatePresence>
     </section>
   );
 }

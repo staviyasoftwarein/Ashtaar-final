@@ -1,4 +1,5 @@
 import { useRef, useEffect } from 'react';
+import { motion } from 'motion/react';
 import gsap from 'gsap';
 import ScrollTrigger from 'gsap/ScrollTrigger';
 
@@ -44,18 +45,51 @@ export default function About() {
   }, []);
 
   return (
-    <div id="about" ref={containerRef} className="h-screen bg-black text-white flex items-center justify-center px-6 md:px-24 relative z-20 overflow-hidden">
+    <div id="about" ref={containerRef} className="h-screen bg-transparent text-white flex items-center justify-center px-6 md:px-24 relative z-20 overflow-hidden">
       
-      {/* Cinematic Spotlight / Glow */}
-      <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
-        <div className="w-[400px] h-[400px] md:w-[600px] md:h-[600px] bg-[#D4AF37]/[0.07] rounded-full blur-[100px] md:blur-[120px] animate-pulse"></div>
+      {/* Rich Cinematic Background */}
+      <div className="absolute inset-0 pointer-events-none flex items-center justify-center z-0 overflow-hidden bg-black/60 backdrop-blur-sm">
+        
+        {/* Breathing Base Glow */}
+        <motion.div 
+          animate={{ opacity: [0.15, 0.3, 0.15], scale: [1, 1.1, 1] }} 
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute inset-0 flex items-center justify-center"
+        >
+          <div className="w-[80vw] h-[80vw] max-w-[800px] max-h-[800px] bg-[#b20710] rounded-full blur-[150px] mix-blend-screen"></div>
+        </motion.div>
+
+        {/* Glow Layer (Blurred Solid Logo) */}
+        <motion.div 
+          animate={{ opacity: [0.2, 0.4, 0.2], scale: [1, 1.02, 1] }}
+          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute flex items-center justify-center select-none mix-blend-screen blur-[20px] md:blur-[30px]"
+        >
+          <svg viewBox="600 0 400 820" className="h-[60vh] md:h-[80vh] w-auto">
+            <polygon points="796.38 2.93 606.08 528.69 987.84 528.69 796.38 2.93" fill="#b20710" />
+            <polygon points="634.3 188.34 957.38 188.34 795.84 528.29 634.3 188.34" fill="#b20710" />
+            <polygon points="604.5 272.73 986.65 272.73 796.38 798.89 604.5 272.73" fill="#ffffff" />
+            <polygon points="673.07 272.71 917.82 272.71 796.38 530.12 673.07 272.71" fill="#ffffff" />
+            <circle cx="795.88" cy="358.97" r="31.51" fill="#ffffff" />
+          </svg>
+        </motion.div>
+
+        {/* Sharp Structure Layer */}
+        <div className="absolute flex items-center justify-center select-none opacity-[0.35] mix-blend-screen drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]">
+          <svg viewBox="600 0 400 820" className="h-[60vh] md:h-[80vh] w-auto">
+            <polygon points="796.38 2.93 606.08 528.69 987.84 528.69 796.38 2.93" fill="none" stroke="#b20710" strokeWidth="4" strokeMiterlimit="10"/>
+            <polygon points="634.3 188.34 957.38 188.34 795.84 528.29 634.3 188.34" fill="none" stroke="#ffffff" strokeWidth="4" strokeMiterlimit="10" />
+            <polygon points="604.5 272.73 986.65 272.73 796.38 798.89 604.5 272.73" fill="none" stroke="#ffffff" strokeWidth="6" strokeMiterlimit="10"/>
+            <polygon points="673.07 272.71 917.82 272.71 796.38 530.12 673.07 272.71" fill="none" stroke="#b20710" strokeWidth="4" strokeMiterlimit="10"/>
+            <circle cx="795.88" cy="358.97" r="31.51" fill="none" stroke="#ffffff" strokeWidth="4" />
+          </svg>
+        </div>
+        
+        {/* Subtle Depth Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#030303] via-transparent to-[#030303]/50"></div>
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff02_1px,transparent_1px),linear-gradient(to_bottom,#ffffff02_1px,transparent_1px)] bg-[size:40px_40px] mix-blend-overlay" />
+        <div className="absolute inset-0 opacity-[0.06] mix-blend-screen" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}></div>
       </div>
-      
-      {/* Film Grain Overlay */}
-      <div 
-        className="absolute inset-0 opacity-[0.04] pointer-events-none mix-blend-screen" 
-        style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}
-      ></div>
 
       <div className="max-w-5xl mx-auto w-full relative z-10">
         <h3 className="text-[#D4AF37] uppercase tracking-[0.2em] text-xs md:text-sm mb-8 md:mb-12 font-sans font-bold flex items-center gap-4">

@@ -2,9 +2,8 @@ import { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'motion/react';
 
 const team = [
-  { name: "Viraj Dave", role: "Producer", img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=2000&auto=format&fit=crop" },
-  { name: "Chinmay Naik", role: "Director", img: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=2000&auto=format&fit=crop" },
-  { name: "Gargey Trivedi", role: "DOP", img: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=2000&auto=format&fit=crop" },
+  { name: "Viraj Dave", role: "Producer", img: "/Producer.jpeg" },
+  { name: "Chinmay Naik", role: "Director", img: "/Director.jpeg" },
 ];
 
 export default function Team() {
@@ -20,13 +19,15 @@ export default function Team() {
   const opacity = useTransform(scrollYProgress, [0, 1], [0.1, 1]);
 
   return (
-    <div id="team" ref={containerRef} className="min-h-screen py-32 px-6 md:px-12 flex flex-col justify-center relative z-20 overflow-hidden" style={{ backgroundColor: '#1a0a0a' }}>
-      {/* Soft radial gradients in muted rose/coral tones */}
-      <div className="absolute inset-0 pointer-events-none" style={{
-        background: 'radial-gradient(circle at 20% 30%, rgba(200, 80, 80, 0.15), transparent 40%), radial-gradient(circle at 80% 70%, rgba(220, 100, 100, 0.1), transparent 50%)'
-      }}></div>
+    <div id="team" ref={containerRef} className="min-h-screen py-32 px-6 md:px-12 flex flex-col justify-center relative z-20 overflow-hidden bg-transparent">
+      {/* Rich Cinematic Background */}
+      <div className="absolute inset-0 pointer-events-none z-0">
+        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1598899134739-24c46f58b8c0?q=80&w=2000')] bg-cover bg-center opacity-10 mix-blend-screen grayscale"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/50 to-transparent"></div>
+        <div className="absolute top-0 left-1/4 w-[50vw] h-[50vh] bg-[#D4AF37]/5 blur-[120px] rounded-full"></div>
+      </div>
 
-      <div className="max-w-7xl mx-auto w-full perspective-[1200px]">
+      <div className="max-w-5xl mx-auto w-full perspective-[1200px]">
         <motion.div 
           style={{
             rotateX,
@@ -35,21 +36,20 @@ export default function Team() {
             opacity,
             transformStyle: "preserve-3d"
           }}
-          className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 md:p-16 shadow-2xl"
+          className="bg-white/5 backdrop-blur-xl border border-white/5 rounded-3xl p-8 md:p-16 shadow-2xl relative z-10"
         >
           <div className="text-center mb-16">
-            <h3 className="text-[#ffb3b3] uppercase tracking-[0.3em] text-sm mb-6 font-sans">The Visionaries</h3>
-            <h2 className="font-serif text-5xl md:text-7xl text-[#fff2f2]">Face Behind The Lens</h2>
+            <h3 className="text-[#D4AF37] uppercase tracking-[0.3em] text-xs md:text-sm mb-6 font-sans font-bold">The Visionaries</h3>
+            <h2 className="font-serif text-4xl md:text-6xl lg:text-7xl text-white">Faces Behind The Lens</h2>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 max-w-4xl mx-auto">
             {team.map((member, i) => (
               <div
                 key={i}
-                className="group relative cursor-pointer bg-[#f8f8f8] p-4 pb-8 shadow-2xl transform transition-all duration-500 hover:-translate-y-4 hover:shadow-[0_20px_40px_rgba(0,0,0,0.5)]"
+                className="group relative cursor-pointer bg-white p-4 pb-8 shadow-2xl transform transition-all duration-500 hover:-translate-y-4 hover:shadow-[0_20px_40px_rgba(212,175,55,0.15)]"
                 style={{
-                  // Slight random rotation for polaroid feel
-                  transform: `rotate(${i === 1 ? 2 : -2}deg)`
+                  transform: `rotate(${i === 0 ? -2 : 2}deg)`
                 }}
               >
                 <div className="aspect-[3/4] overflow-hidden bg-gray-200 mb-6 relative">
