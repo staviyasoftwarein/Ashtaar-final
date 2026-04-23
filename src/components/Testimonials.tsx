@@ -61,16 +61,16 @@ export default function Testimonials() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,_rgba(212,175,55,0.1),_transparent_70%)]"></div>
       </div>
 
-      <div className="absolute top-24 left-0 w-full text-center z-10">
-        <h2 className="font-serif text-5xl md:text-7xl text-black">They said <span className="text-[#D4AF37] italic">"yes!"</span></h2>
+      <div className="absolute top-24 left-0 w-full text-center z-10 px-4">
+        <h2 className="font-serif text-4xl md:text-7xl text-black">They said <span className="text-[#D4AF37] italic">"yes!"</span></h2>
       </div>
       
-      <div className="relative w-full max-w-2xl h-[500px] flex items-center justify-center mt-20">
+      <div className="relative w-full max-w-2xl h-[500px] flex items-center justify-center mt-20 px-4">
         {testimonials.map((t, i) => (
           <div 
             key={i}
             ref={el => cardsRef.current[i] = el}
-            className="absolute w-full max-w-xl bg-white border border-gray-200 p-8 md:p-12 shadow-[0_20px_40px_rgba(0,0,0,0.1)]"
+            className="absolute w-[90%] md:w-full max-w-xl bg-white border border-gray-200 p-6 md:p-12 shadow-[0_20px_40px_rgba(0,0,0,0.1)]"
             style={{ zIndex: i }}
           >
             <div className="absolute -top-6 -left-4 text-8xl text-[#f5f0eb] font-serif opacity-50">"</div>

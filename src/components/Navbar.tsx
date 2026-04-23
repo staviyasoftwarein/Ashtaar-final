@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Menu, X, ArrowRight } from 'lucide-react';
+import { Menu, X, ArrowRight, Instagram, Twitter, Linkedin, Youtube } from 'lucide-react';
 
 const AshtaarLogo = ({ className = "h-8 w-auto" }) => (
   <svg viewBox="600 0 400 820" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
@@ -170,10 +170,20 @@ export default function Navbar() {
               </div>
             </div>
 
-            <div className="relative z-10 px-6 py-8 md:px-12 flex flex-col md:flex-row justify-between items-center text-[10px] md:text-xs text-white/30 font-mono uppercase tracking-[0.2em] border-t border-white/5 mt-auto">
-               <p>Surat, Gujarat, India</p>
-               <a href="mailto:contact@ashtaarfilms.com" className="hover:text-[#D4AF37] mt-4 md:mt-0 transition-colors">contact@ashtaarfilms.com</a>
-               <p className="mt-4 md:mt-0">© {new Date().getFullYear()} Ashtaar Films</p>
+            <div className="relative z-10 px-6 py-8 md:px-12 flex flex-col xl:flex-row justify-between items-center text-[10px] md:text-xs text-white/30 font-mono uppercase tracking-[0.2em] border-t border-white/5 mt-auto gap-8 xl:gap-0">
+               <div className="flex flex-col md:flex-row items-center gap-4 md:gap-8 text-center md:text-left">
+                 <p>Surat, Gujarat, India</p>
+                 <a href="mailto:contact@ashtaarfilms.com" className="hover:text-[#D4AF37] transition-colors">contact@ashtaarfilms.com</a>
+               </div>
+               
+               <div className="flex items-center gap-8 text-white/50">
+                 <a href="#" className="hover:text-[#D4AF37] transition-colors"><Instagram size={18} /></a>
+                 <a href="#" className="hover:text-[#D4AF37] transition-colors"><Youtube size={18} /></a>
+                 <a href="#" className="hover:text-[#D4AF37] transition-colors"><Twitter size={18} /></a>
+                 <a href="#" className="hover:text-[#D4AF37] transition-colors"><Linkedin size={18} /></a>
+               </div>
+               
+               <p className="text-center xl:text-right">© {new Date().getFullYear()} Ashtaar Films</p>
             </div>
           </motion.div>
         )}

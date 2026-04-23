@@ -53,7 +53,7 @@ export default function Team() {
                 }}
               >
                 <div className="aspect-[3/4] overflow-hidden bg-gray-200 mb-6 relative">
-                  <img src={member.img} alt={member.name} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 scale-105 group-hover:scale-100" />
+                  <img src={member.img} alt={member.name} className="w-full h-full object-cover grayscale-0 group-hover:grayscale-[60%] transition-all duration-700 scale-100 group-hover:scale-105" />
                   {/* Subtle inner shadow for depth */}
                   <div className="absolute inset-0 shadow-[inset_0_0_20px_rgba(0,0,0,0.2)] pointer-events-none"></div>
                 </div>

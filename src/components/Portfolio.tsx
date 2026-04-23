@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { motion, useScroll, useTransform, useSpring, AnimatePresence } from 'motion/react';
 import { Play, Youtube, BarChart2, Sparkles, ArrowUpRight, Cpu } from 'lucide-react';
 

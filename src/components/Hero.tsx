@@ -49,7 +49,7 @@ export default function Hero() {
       <div className="absolute inset-0 w-full h-full bg-white flex flex-col justify-center items-center mix-blend-screen">
         <h2 
           ref={textRef}
-          className="text-[80px] md:text-[120px] font-hero text-black m-0 p-0 origin-center whitespace-nowrap"
+          className="text-[18vw] sm:text-[80px] md:text-[120px] font-hero text-black m-0 p-0 origin-center whitespace-nowrap"
         >
           ASHTAAR
         </h2>
