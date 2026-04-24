@@ -8,22 +8,14 @@ import { X } from 'lucide-react';
 gsap.registerPlugin(ScrollTrigger);
 
 const images = [
-  'https://images.unsplash.com/photo-1598899134739-24c46f58b8c0?q=80&w=2056&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=2025&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=2059&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1518134346374-184f9d21cea2?q=80&w=2036&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1440404653325-ab127d49abc1?q=80&w=2070&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=1000&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1493225457124-a1a2a5956093?q=80&w=1000&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=1000&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=2000&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=2000&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=2000&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1598899134739-24c46f58b8c0?q=80&w=2056&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=2025&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=2059&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1518134346374-184f9d21cea2?q=80&w=2036&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1440404653325-ab127d49abc1?q=80&w=2070&auto=format&fit=crop',
+  '/bts1.jpg',
+  '/bts2.jpg',
+  '/bts3.jpg',
+  '/bts4.jpg',
+  '/bts5.jpg',
+  '/bts6.jpg',
+  '/bts7.jpg',
+  '/bts8.jpg',
 ];
 
 const positions = [
@@ -85,61 +77,62 @@ export default function BehindTheScenes() {
       const screenHeight = window.innerHeight;
       const screenWidth = window.innerWidth;
       const isMobile = screenWidth < 800;
-      const spread = isMobile ? 1.5 : 0.7;
+      const spread = isMobile ? 1.0 : 0.9;
 
-      const initPos = imgs.map(() => ({
-        x: 0,
-        y: 0,
-        z: -1000,
-        scale: 0
-      }));
+      // Set initial state
+      imgs.forEach((img) => {
+        gsap.set(img, {
+          x: 0,
+          y: 0,
+          z: -1500,
+          scale: 0,
+          autoAlpha: 0,
+          force3D: true,
+          willChange: 'transform, opacity'
+        });
+      });
 
-      const finalPos = imgs.map((_, index) => {
-        const pos = positions[index % positions.length];
-        return {
-          x: pos.x * screenWidth * spread,
-          y: pos.y * screenHeight * spread,
-          z: 2000,
-          scale: 1
-        };
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: flow,
+          start: "top top",
+          end: `+=${screenHeight * 4}px`,
+          pin: true,
+          scrub: 1.2, // Smooth scrubbing
+        }
       });
 
       imgs.forEach((img, index) => {
-        gsap.set(img, initPos[index]);
-      });
+        const pos = positions[index % positions.length];
+        const isLast = index === imgs.length - 1;
+        
+        let targetX = pos.x * screenWidth * spread;
+        let targetY = pos.y * screenHeight * spread;
+        let targetZ = 1800;
+        let targetScale = 1;
 
-      ScrollTrigger.create({
-        trigger: flow,
-        start: "top top",
-        end: `+=${screenHeight * 5}px`,
-        pin: true,
-        pinSpacing: true,
-        scrub: 1,
-        onUpdate: (self) => {
-          const progress = self.progress;
-
-          imgs.forEach((img, index) => {
-            const imgDelay = index * 0.03;
-            const imgProgress = Math.max(0, (progress - imgDelay) * 4);
-
-            const start = initPos[index];
-            const end = finalPos[index];
-
-            let x = gsap.utils.interpolate(start.x, end.x, imgProgress);
-            let y = gsap.utils.interpolate(start.y, end.y, imgProgress);
-            let z = gsap.utils.interpolate(start.z, end.z, imgProgress);
-            let scale = gsap.utils.interpolate(start.scale, end.scale, imgProgress);
-            
-            if(index === imgs.length - 1){
-                x = 0;
-                y = 0;
-                z = z * 0.4;
-            }
-            
-            gsap.set(img, { x, y, z, scale });
-          });
+        if (isLast) {
+          targetX = 0;
+          targetY = 0;
+          targetZ = 600; // Leave the last one visible and readable
         }
+
+        tl.to(img, {
+          x: targetX,
+          y: targetY,
+          z: targetZ,
+          scale: targetScale,
+          autoAlpha: 1,
+          ease: "none", // Using "none" instead of power1 for smoother constant movement
+          duration: 1,
+          onUpdate: function() {
+            // Store current z depth for click detection
+            const currentZ = gsap.getProperty(img, "z") as number;
+            (img as any)._currentZ = currentZ;
+          }
+        }, index * 0.1); // Stagger tightly
       });
+
     }, containerRef);
 
     return () => ctx.revert();
@@ -149,7 +142,7 @@ export default function BehindTheScenes() {
     <div id="bts" ref={containerRef} className="h-screen bg-black relative overflow-hidden z-20">
       {/* Immersive Background */}
       <div className="absolute inset-0 pointer-events-none z-0">
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1542204165-65bf26472b9b?q=80&w=2000')] bg-cover bg-center opacity-20 mix-blend-screen grayscale"></div>
+        <div className="absolute inset-0 bg-[url('/bts1.jpg')] bg-cover bg-center opacity-20 mix-blend-screen grayscale"></div>
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_transparent_30%,_#000_100%)]"></div>
         <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0.8),rgba(0,0,0,0.4),rgba(0,0,0,0.9))]"></div>
       </div>
@@ -166,12 +159,20 @@ export default function BehindTheScenes() {
           <div
             key={i}
             ref={el => imagesRef.current[i] = el}
-            onClick={() => setSelectedGalleryIndex(i)}
-            className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[200px] md:w-[500px] md:h-[350px] cursor-pointer pointer-events-auto group ${i === images.length - 1 ? 'after:content-[""] after:absolute after:inset-0 after:bg-black/40' : ''}`}
+            onClick={() => {
+              const z = (imagesRef.current[i] as any)?._currentZ || 0;
+              // Only allow clicking if the image has moved forward enough (50-60% into screen feel)
+              if (z > 400) {
+                setSelectedGalleryIndex(i);
+              }
+            }}
+            className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[190px] md:w-[500px] md:h-[350px] cursor-pointer pointer-events-auto group ${i === images.length - 1 ? 'after:content-[""] after:absolute after:inset-0 after:bg-black/40' : ''}`}
           >
             <img 
               src={src} 
               alt="BTS" 
+              loading="lazy"
+              decoding="async"
               className="w-full h-full object-cover shadow-[0_0_50px_rgba(0,0,0,0.8)] group-hover:brightness-125 transition-[filter] duration-300"
             />
           </div>
@@ -218,6 +219,8 @@ export default function BehindTheScenes() {
                       whileInView={{ scale: 1, opacity: 1 }}
                       transition={{ duration: 0.5 }}
                       src={src} 
+                      loading="lazy"
+                      decoding="async"
                       className="max-w-[90vw] max-h-[75vh] md:max-w-full md:max-h-full object-contain pointer-events-none drop-shadow-2xl"
                     />
                   </div>

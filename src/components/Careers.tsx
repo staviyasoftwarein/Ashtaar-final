@@ -3,22 +3,22 @@ import { motion, AnimatePresence } from 'motion/react';
 import { ArrowLeft, ArrowUpRight } from 'lucide-react';
 
 const rolesData = [
-  { title: "Director", dept: "Direction", quote: "Vision is the art of seeing what is invisible to others.", img: "https://images.unsplash.com/photo-1585951237318-9ea5e175b891?q=80&w=2070" },
-  { title: "Assistant Director", dept: "Direction", quote: "Chaos management disguised as scheduling.", img: "https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?q=80&w=2070" },
-  { title: "Producer", dept: "Production", quote: "Making the impossible happen, on schedule and under budget.", img: "https://images.unsplash.com/photo-1518134346374-184f9d21cea2?q=80&w=2036" },
-  { title: "Cinematographer (DOP)", dept: "Camera", quote: "Painting with light and shadow.", img: "https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=2059" },
-  { title: "Script Writer", dept: "Story", quote: "The blank page is the ultimate canvas.", img: "https://images.unsplash.com/photo-1455390582262-044cdead27d8?q=80&w=2073" },
-  { title: "Video Editor", dept: "Post-Production", quote: "Sculpting time and emotion in the cutting room.", img: "https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?q=80&w=2070" },
-  { title: "Sound Designer", dept: "Audio", quote: "Hearing is feeling. We design the heartbeat.", img: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2000" },
-  { title: "Production Manager", dept: "Production", quote: "The architectural backbone of every rolling camera.", img: "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=2000" },
-  { title: "Casting Director", dept: "Talent", quote: "Discovering the faces that will define the film.", img: "https://images.unsplash.com/photo-1601506521937-0121a7fc2a6b?q=80&w=2071" },
-  { title: "VFX Artist", dept: "Post-Production", quote: "Where imagination dictates physical reality.", img: "https://images.unsplash.com/photo-1618365908648-e71bd5716cba?q=80&w=2000" },
-  { title: "Motion Graphics Designer", dept: "Design", quote: "Breathing kinetic energy into static pixels.", img: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=2000" },
-  { title: "Production Assistant", dept: "Production", quote: "The glue handling a thousand invisible miracles.", img: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=2000" },
-  { title: "Art Director", dept: "Creative", quote: "Building worlds from the ground up.", img: "https://images.unsplash.com/photo-1461344577544-4e5dc9487184?q=80&w=2000" },
-  { title: "Costume Designer", dept: "Art Dept", quote: "Telling stories through fabric and thread.", img: "https://images.unsplash.com/photo-1532453288672-3a27e9be9efd?q=80&w=2000" },
-  { title: "Social Media Manager", dept: "Marketing", quote: "Translating cinematic epics into digital pulses.", img: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=2000" },
-  { title: "Marketing Executive", dept: "Marketing", quote: "Engineering the global anticipation of modern myth.", img: "https://images.unsplash.com/photo-1533750516457-a7eb6e06dd87?q=80&w=2000" }
+  { title: "Director", dept: "Direction", quote: "Vision is the art of seeing what is invisible to others.", img: "/bts1.jpeg" },
+  { title: "Assistant Director", dept: "Direction", quote: "Chaos management disguised as scheduling.", img: "/bts2.jpeg" },
+  { title: "Producer", dept: "Production", quote: "Making the impossible happen, on schedule and under budget.", img: "/bts3.jpeg" },
+  { title: "Cinematographer (DOP)", dept: "Camera", quote: "Painting with light and shadow.", img: "/bts4.jpeg" },
+  { title: "Script Writer", dept: "Story", quote: "The blank page is the ultimate canvas.", img: "/bts5.jpeg" },
+  { title: "Video Editor", dept: "Post-Production", quote: "Sculpting time and emotion in the cutting room.", img: "/bts6.jpeg" },
+  { title: "Sound Designer", dept: "Audio", quote: "Hearing is feeling. We design the heartbeat.", img: "/bts7.jpeg" },
+  { title: "Production Manager", dept: "Production", quote: "The architectural backbone of every rolling camera.", img: "/bts8.jpeg" },
+  { title: "Casting Director", dept: "Talent", quote: "Discovering the faces that will define the film.", img: "/bts9.jpeg" },
+  { title: "VFX Artist", dept: "Post-Production", quote: "Where imagination dictates physical reality.", img: "/bts10.jpeg" },
+  { title: "Motion Graphics Designer", dept: "Design", quote: "Breathing kinetic energy into static pixels.", img: "/bts11.jpeg" },
+  { title: "Production Assistant", dept: "Production", quote: "The glue handling a thousand invisible miracles.", img: "/bts12.jpeg" },
+  { title: "Art Director", dept: "Creative", quote: "Building worlds from the ground up.", img: "/bts1.jpeg" },
+  { title: "Costume Designer", dept: "Art Dept", quote: "Telling stories through fabric and thread.", img: "/bts2.jpeg" },
+  { title: "Social Media Manager", dept: "Marketing", quote: "Translating cinematic epics into digital pulses.", img: "/bts3.jpeg" },
+  { title: "Marketing Executive", dept: "Marketing", quote: "Engineering the global anticipation of modern myth.", img: "/bts4.jpeg" }
 ];
 
 export default function Careers() {
@@ -66,7 +66,7 @@ export default function Careers() {
                 className="absolute inset-0 w-full h-full"
               >
                  {/* Dark, gritty base image if no hover */}
-                 <img src="https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=2600" className="w-full h-full object-cover opacity-[0.15] grayscale blur-[2px]" />
+                 <img src="/bts7.jpeg" className="w-full h-full object-cover opacity-[0.15] grayscale blur-[2px]" />
               </motion.div>
             )}
           </AnimatePresence>

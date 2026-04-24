@@ -22,7 +22,7 @@ export default function Team() {
     <div id="team" ref={containerRef} className="min-h-screen py-32 px-6 md:px-12 flex flex-col justify-center relative z-20 overflow-hidden bg-transparent">
       {/* Rich Cinematic Background */}
       <div className="absolute inset-0 pointer-events-none z-0">
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1598899134739-24c46f58b8c0?q=80&w=2000')] bg-cover bg-center opacity-10 mix-blend-screen grayscale"></div>
+        <div className="absolute inset-0 bg-[url('/bts4.jpeg')] bg-cover bg-center opacity-10 mix-blend-screen grayscale"></div>
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/50 to-transparent"></div>
         <div className="absolute top-0 left-1/4 w-[50vw] h-[50vh] bg-[#D4AF37]/5 blur-[120px] rounded-full"></div>
       </div>

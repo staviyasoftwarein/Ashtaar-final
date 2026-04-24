@@ -48,29 +48,29 @@ export default function About() {
     <div id="about" ref={containerRef} className="h-screen bg-transparent text-white flex items-center justify-center px-6 md:px-24 relative z-20 overflow-hidden">
       
       {/* Rich Cinematic Background */}
-      <div className="absolute inset-0 pointer-events-none flex items-center justify-center z-0 overflow-hidden bg-black/60 backdrop-blur-sm">
+      <div className="absolute inset-0 pointer-events-none flex items-center justify-center z-0 overflow-hidden bg-black/80 backdrop-blur-md">
         
         {/* Breathing Base Glow */}
         <motion.div 
-          animate={{ opacity: [0.15, 0.3, 0.15], scale: [1, 1.1, 1] }} 
+          animate={{ opacity: [0.1, 0.2, 0.1], scale: [1, 1.1, 1] }} 
           transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
           className="absolute inset-0 flex items-center justify-center"
         >
-          <div className="w-[80vw] h-[80vw] max-w-[800px] max-h-[800px] bg-[#b20710] rounded-full blur-[150px] mix-blend-screen"></div>
+          <div className="w-[80vw] h-[80vw] max-w-[800px] max-h-[800px] bg-[#b20710] rounded-full blur-[150px] mix-blend-screen opacity-50"></div>
         </motion.div>
 
         {/* Glow Layer (Blurred Solid Logo) */}
         <motion.div 
-          animate={{ opacity: [0.2, 0.4, 0.2], scale: [1, 1.02, 1] }}
+          animate={{ opacity: [0.1, 0.2, 0.1], scale: [1, 1.02, 1] }}
           transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
           className="absolute flex items-center justify-center select-none mix-blend-screen blur-[20px] md:blur-[30px]"
         >
           <svg viewBox="600 0 400 820" className="h-[60vh] md:h-[80vh] w-auto">
-            <polygon points="796.38 2.93 606.08 528.69 987.84 528.69 796.38 2.93" fill="#b20710" />
-            <polygon points="634.3 188.34 957.38 188.34 795.84 528.29 634.3 188.34" fill="#b20710" />
-            <polygon points="604.5 272.73 986.65 272.73 796.38 798.89 604.5 272.73" fill="#ffffff" />
-            <polygon points="673.07 272.71 917.82 272.71 796.38 530.12 673.07 272.71" fill="#ffffff" />
-            <circle cx="795.88" cy="358.97" r="31.51" fill="#ffffff" />
+            <polygon points="796.38 2.93 606.08 528.69 987.84 528.69 796.38 2.93" fill="#80050b" />
+            <polygon points="634.3 188.34 957.38 188.34 795.84 528.29 634.3 188.34" fill="#80050b" />
+            <polygon points="604.5 272.73 986.65 272.73 796.38 798.89 604.5 272.73" fill="#a0a0a0" />
+            <polygon points="673.07 272.71 917.82 272.71 796.38 530.12 673.07 272.71" fill="#a0a0a0" />
+            <circle cx="795.88" cy="358.97" r="31.51" fill="#a0a0a0" />
           </svg>
         </motion.div>
 

@@ -33,30 +33,38 @@ const TextContainerAmbient = ({ watermark, glowColor }: { watermark: string, glo
   </div>
 );
 
-const SectionSubhead = ({ num, text }: { num: string, text: string }) => (
+const SectionTitle = ({ num, text }: { num: string, text: string }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true, amount: 0.1 }}
+    transition={{ delay: 0.1, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+    className="mb-4 md:mb-6 shrink-0 flex flex-col"
+  >
+    <div className="font-serif italic text-3xl md:text-5xl lg:text-6xl text-[#D4AF37] mb-2 leading-none">{num}</div>
+    <h2 className="text-5xl sm:text-6xl md:text-7xl lg:text-[6rem] xl:text-[7.5rem] font-black text-white leading-[0.8] tracking-[-0.03em] drop-shadow-2xl uppercase">
+      {text.split(' ').map((word, i, arr) => (
+         <React.Fragment key={i}>
+           {word}
+           {i !== arr.length - 1 && <br className="hidden lg:block" />}
+           {i !== arr.length - 1 && <span className="lg:hidden"> </span>}
+         </React.Fragment>
+      ))}
+    </h2>
+  </motion.div>
+);
+
+const SectionSubhead = ({ text }: { text: string }) => (
   <motion.div 
     initial={{ opacity: 0, x: -20 }}
     whileInView={{ opacity: 1, x: 0 }}
     viewport={{ once: true, amount: 0.1 }}
     transition={{ duration: 0.5 }}
-    className="flex items-center gap-3 md:gap-4 mb-3 md:mb-8 text-white/50 shrink-0"
+    className="flex items-center gap-3 md:gap-4 mb-4 md:mb-8 shrink-0"
   >
-    <span className="font-serif italic text-xl md:text-2xl text-[#D4AF37]">{num}</span>
-    <div className="w-8 md:w-12 h-[1px] bg-white/20"></div>
-    <span className="font-mono text-[10px] md:text-xs tracking-[0.2em] uppercase">{text}</span>
+    <div className="w-8 md:w-12 h-[2px] bg-white/30"></div>
+    <h3 className="font-mono text-xs md:text-sm lg:text-base tracking-[0.2em] uppercase text-white/80 font-bold whitespace-pre-line leading-snug">{text}</h3>
   </motion.div>
-);
-
-const SectionTitle = ({ children }: { children: React.ReactNode }) => (
-  <motion.h2 
-    initial={{ opacity: 0, y: 20 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    viewport={{ once: true, amount: 0.1 }}
-    transition={{ delay: 0.1, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-    className="text-4xl md:text-6xl lg:text-[5rem] font-black text-white leading-[0.9] tracking-tighter mb-3 md:mb-6 shrink-0"
-  >
-    {children}
-  </motion.h2>
 );
 
 const SectionDesc = ({ children }: { children: React.ReactNode }) => (
@@ -84,8 +92,8 @@ function Slide1_FeatureFilm() {
          <TextContainerAmbient watermark="01" glowColor="bg-[#b20710]" />
          
          <div className="relative z-10 w-full h-full flex flex-col justify-center px-6 py-6 md:p-16 lg:p-24 overflow-y-auto custom-scrollbar">
-           <SectionSubhead num="01" text="Feature Film" />
-           <SectionTitle>DUSSEHRA</SectionTitle>
+           <SectionTitle num="01" text="Theatrical Release" />
+           <SectionSubhead text="DUSSEHRA" />
            <SectionDesc>
              An epic cinematic journey captured flawlessly. A visual masterpiece that redefines storytelling for the modern era. Experience the intensity and grandeur of our latest theatrical release.
            </SectionDesc>
@@ -165,8 +173,8 @@ function Slide1_FeatureFilm() {
    SLIDE 2: VFX & ANIME 
    ====================================================================== */
 const vfxData = [
-  { id: 'vfx', tag: 'VFX Production', title: 'DEFYING\nREALITY', desc: 'Industry-leading composite structures and CGI pipelines. We manipulate reality at the pixel level to build environments that defy physics.', img: 'https://images.unsplash.com/photo-1618365908648-e71bd5716cba?q=80&w=2000' },
-  { id: 'anime', tag: 'Anime 2D/3D', title: 'BOUNDLESS\nWORLDS', desc: 'Striking cel-shaded aesthetics blending traditional art with next-gen rigging. Bringing vibrant, culturally rich stories to life.', img: 'https://images.unsplash.com/photo-1607604276583-1fe35bf7c3de?q=80&w=2000' }
+  { id: 'vfx', tag: 'VFX Production', title: 'DEFYING\nREALITY', desc: 'Industry-leading composite structures and CGI pipelines. We manipulate reality at the pixel level to build environments that defy physics.', img: '/bts5.jpeg' },
+  { id: 'anime', tag: 'Anime 2D/3D', title: 'BOUNDLESS\nWORLDS', desc: 'Striking cel-shaded aesthetics blending traditional art with next-gen rigging. Bringing vibrant, culturally rich stories to life.', img: '/bts6.jpeg' }
 ];
 
 function Slide2_VFXAnime() {
@@ -179,38 +187,36 @@ function Slide2_VFXAnime() {
          <TextContainerAmbient watermark="02" glowColor="bg-white" />
          
          <div className="relative z-10 w-full h-full flex flex-col justify-center px-6 py-4 md:p-16 lg:p-24 overflow-y-auto custom-scrollbar">
-           <SectionSubhead num="02" text="Animation & FX" />
-           
-           <motion.div 
-             initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-             className="flex flex-wrap gap-2 md:gap-3 mb-6 md:mb-10 shrink-0"
-           >
-             {vfxData.map((d, i) => (
-               <button 
-                 key={d.id} onClick={() => setActive(i)}
-                 className={`flex items-center gap-2 px-4 py-2 rounded-full text-[10px] md:text-xs tracking-[0.2em] font-mono uppercase transition-all duration-300 border ${active === i ? 'bg-white text-black border-white shadow-[0_0_20px_rgba(255,255,255,0.2)]' : 'bg-transparent text-white/50 border-white/20 hover:text-white hover:border-white'}`}
-               >
-                 {active === i && <Sparkles className="w-3 h-3" />}
-                 {d.tag}
-               </button>
-             ))}
-           </motion.div>
+          <SectionTitle num="02" text="Visual Effects" />
+          
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
+            className="flex flex-wrap gap-2 md:gap-3 mb-6 md:mb-10 shrink-0"
+          >
+            {vfxData.map((d, i) => (
+              <button 
+                key={d.id} onClick={() => setActive(i)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-full text-[10px] md:text-xs tracking-[0.2em] font-mono uppercase transition-all duration-300 border ${active === i ? 'bg-[#D4AF37] text-black border-[#D4AF37] shadow-[0_0_20px_rgba(212,175,55,0.3)]' : 'bg-[#D4AF37]/5 text-[#D4AF37]/70 border-[#D4AF37]/20 hover:bg-[#D4AF37]/10 hover:border-[#D4AF37] hover:text-[#D4AF37]'}`}
+              >
+                {active === i && <Sparkles className="w-3 h-3" />}
+                {d.tag}
+              </button>
+            ))}
+          </motion.div>
 
-           <div className="min-h-[140px] md:min-h-[200px]">
-             <AnimatePresence mode="wait">
-               <motion.div 
-                 key={active}
-                 initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }} transition={{ duration: 0.3 }}
-               >
-                 <h2 className="text-3xl md:text-5xl lg:text-[4.5rem] font-black text-white leading-[0.9] tracking-tighter mb-4 whitespace-pre-line">
-                   {vfxData[active].title}
-                 </h2>
-                 <p className="text-white/50 text-xs md:text-base lg:text-lg max-w-md font-light leading-relaxed">
-                   {vfxData[active].desc}
-                 </p>
-               </motion.div>
-             </AnimatePresence>
-           </div>
+          <div className="min-h-[140px] md:min-h-[200px]">
+            <AnimatePresence mode="wait">
+              <motion.div 
+                key={active}
+                initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }} transition={{ duration: 0.3 }}
+              >
+                <SectionSubhead text={vfxData[active].title} />
+                <p className="text-white/50 text-xs md:text-base lg:text-lg max-w-md font-light leading-relaxed">
+                  {vfxData[active].desc}
+                </p>
+              </motion.div>
+            </AnimatePresence>
+          </div>
          </div>
       </div>
 
@@ -254,66 +260,55 @@ function Slide3_Music() {
   const thumb = `https://img.youtube.com/vi/${track.id}/maxresdefault.jpg`;
 
   return (
-    <div className="w-screen h-[100dvh] shrink-0 flex flex-col md:flex-row bg-[#0f0f0f] relative overflow-hidden">
-      {/* Blurred background linking to active track */}
-      <AnimatePresence mode="wait">
-        <motion.img 
-          key={activeIdx} src={thumb}
-          initial={{ opacity: 0 }} animate={{ opacity: 0.2 }} exit={{ opacity: 0 }} transition={{ duration: 1 }}
-          className="absolute inset-0 w-full h-full object-cover blur-[80px] pointer-events-none"
-        />
-      </AnimatePresence>
-
-      {/* Left Intro (Now Playing) */}
-      <div className="relative w-full md:w-[45%] lg:w-[40%] h-[55%] md:h-full flex flex-col justify-center border-b md:border-b-0 md:border-r border-white/10 shrink-0 overflow-hidden">
-         {/* Do not supply a bg-color to the glow here so it borrows the red of the YouTube player, and doesn't block the blur */}
-         <TextContainerAmbient watermark="03" glowColor="bg-[#FF0000]" />
+    <div className="w-screen h-[100dvh] shrink-0 flex flex-col md:flex-row bg-[#080808]">
+      {/* Left Intro */}
+      <div className="relative w-full md:w-[45%] lg:w-[40%] h-1/2 md:h-full flex flex-col justify-center border-b md:border-b-0 md:border-r border-white/5 shrink-0 overflow-hidden bg-[#0a0a0a]">
+         <TextContainerAmbient watermark="03" glowColor="bg-[#FF0000]/20" />
          
          <div className="relative z-10 w-full h-full flex flex-col justify-center px-6 py-6 md:p-16 lg:p-24 overflow-y-auto custom-scrollbar">
-           <SectionSubhead num="03" text="Ashtaar Music Production" />
+           <SectionTitle num="03" text="The Playlist" />
+           <SectionSubhead text="ASHTAAR MUSIC PRODUCTION" />
            
-           <motion.div 
-             initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }}
-             className="w-full flex justify-center mb-6 md:mb-10 relative shrink-0"
-           >
+           <div className="flex flex-col xl:flex-row items-center xl:items-start gap-6 md:gap-8 mb-8 mt-2 shrink-0 w-full">
               <motion.div 
-                className="w-[140px] h-[140px] md:w-[280px] md:h-[280px] rounded-full shadow-[0_20px_50px_rgba(0,0,0,0.8)] border-[4px] md:border-[6px] border-[#050505] overflow-hidden"
+                className="w-40 h-40 md:w-56 md:h-56 lg:w-64 lg:h-64 rounded-full shadow-[0_20px_50px_rgba(0,0,0,0.8)] border-[4px] md:border-[6px] border-[#050505] overflow-hidden shrink-0 relative"
                 animate={{ rotate: 360 }} transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
               >
-                 <img src={thumb} className="w-full h-full object-cover scale-150" />
+                 <img src={thumb} className="w-full h-full object-cover scale-125" />
+                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 md:w-12 md:h-12 bg-[#080808] rounded-full border border-white/20 z-10 flex items-center justify-center">
+                    <div className="w-2 h-2 bg-black rounded-full"></div>
+                 </div>
               </motion.div>
-              {/* Record Hole */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-6 h-6 md:w-12 md:h-12 bg-[#0f0f0f] rounded-full border border-white/20 z-10 flex items-center justify-center">
-                <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-black rounded-full"></div>
+              <div className="min-w-0 text-center xl:text-left xl:mt-8 w-full max-w-sm">
+                <h4 className="text-white font-bold text-xl md:text-2xl mb-1 md:mb-2 truncate">{track.title}</h4>
+                <p className="text-[#FF0000] font-mono text-[10px] md:text-xs uppercase tracking-widest truncate">{track.artist}</p>
               </div>
-           </motion.div>
+           </div>
 
-           <motion.div initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="shrink-0 text-center md:text-left">
-             <h3 className="text-xl md:text-4xl font-bold text-white mb-1 md:mb-3 truncate">{track.title}</h3>
-             <p className="text-white/60 text-xs md:text-lg mb-4 md:mb-8">{track.artist}</p>
-             
+           <motion.div initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="shrink-0">
              <a 
                href={`https://youtu.be/${track.id}`} target="_blank" rel="noreferrer"
-               className="flex items-center justify-center gap-2 md:gap-3 w-full bg-white text-black py-3 md:py-4 rounded-full hover:bg-[#FF0000] hover:text-white transition-colors font-bold text-xs md:text-sm tracking-wide shadow-xl group"
+               className="flex items-center justify-center gap-2 md:gap-3 w-full max-w-xs bg-white text-black py-3 md:py-4 rounded-full hover:bg-[#FF0000] hover:text-white transition-colors font-bold text-xs md:text-sm tracking-wide shadow-xl group"
              >
-               <Youtube className="w-4 h-4 md:w-5 md:h-5 group-hover:drop-shadow-md" /> Play Full Track
+               <Youtube className="w-4 h-4 md:w-5 md:h-5" /> Play Full Track
              </a>
            </motion.div>
          </div>
       </div>
 
       {/* Right Media (Playlist) */}
-      <div className="w-full md:w-[55%] lg:w-[60%] h-[45%] md:h-full flex flex-col p-4 md:p-12 lg:p-24 z-10 bg-[#000000]/40 backdrop-blur-sm overflow-hidden">
+      <div className="w-full md:w-[55%] lg:w-[60%] h-1/2 md:h-full flex flex-col p-4 md:p-12 lg:p-24 z-10 bg-[#000000]/60 backdrop-blur-md overflow-hidden">
          <motion.div 
            initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-           className="flex justify-between items-end mb-4 md:mb-8 shrink-0"
+           className="flex justify-between items-center mb-4 md:mb-10 shrink-0"
          >
-           <div>
-             <div className="text-[#FF0000] text-[10px] md:text-xs font-bold tracking-[0.2em] uppercase mb-1 md:mb-2">The Playlist</div>
-             <h2 className="text-2xl md:text-5xl font-black text-white">YT ORIGINALS</h2>
+           <div className="flex items-center gap-3">
+             <div className="w-1 h-6 bg-[#FF0000]"></div>
+             <div className="text-white/40 text-[10px] md:text-xs font-bold tracking-[0.2em] uppercase">Queue • {ytTracks.length} Tracks</div>
            </div>
            <BarChart2 className="w-6 h-6 md:w-8 md:h-8 text-white/20 hidden md:block" />
          </motion.div>
+
 
          <motion.div 
            initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}
@@ -351,14 +346,14 @@ function Slide3_Music() {
    ====================================================================== */
 function Slide4_AI() {
   return (
-    <div className="w-screen h-[100dvh] shrink-0 flex flex-col md:flex-row bg-[#030303]">
+    <div className="w-screen h-[100dvh] shrink-0 flex flex-col md:flex-row bg-[#080808]">
       {/* Left Intro */}
-      <div className="relative w-full md:w-[45%] lg:w-[40%] h-1/2 md:h-full flex flex-col justify-center border-b md:border-b-0 md:border-r border-white/5 overflow-hidden shrink-0 bg-[#030303]">
-         <TextContainerAmbient watermark="04" glowColor="bg-[#D4AF37]" />
+      <div className="relative w-full md:w-[45%] lg:w-[40%] h-1/2 md:h-full flex flex-col justify-center border-b md:border-b-0 md:border-r border-white/5 overflow-hidden shrink-0 bg-[#0a0a0a]">
+         <TextContainerAmbient watermark="04" glowColor="bg-white" />
          
          <div className="relative z-10 w-full h-full flex flex-col justify-center px-6 py-6 md:p-16 lg:p-24 overflow-y-auto custom-scrollbar">
-           <SectionSubhead num="04" text="Advanced Tech" />
-           <SectionTitle>AI<br/>ANIMATION</SectionTitle>
+           <SectionTitle num="04" text="AI Animation" />
+           <SectionSubhead text="Advanced Tech" />
            <SectionDesc>
               Harnessing generative latent diffusion and custom computational pipelines. We synthesize impossible visual architectures to pioneer the absolute cutting edge of digital storytelling.
            </SectionDesc>
@@ -376,7 +371,7 @@ function Slide4_AI() {
       <div className="w-full md:w-[55%] lg:w-[60%] h-1/2 md:h-full relative overflow-hidden bg-[#000] flex items-center justify-center p-4 md:p-12">
          {/* Background generative feel */}
          <img 
-           src="https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=2000" 
+           src="/bts12.jpeg" 
            className="absolute inset-0 w-full h-full object-cover opacity-30 blur-sm scale-110" 
          />
          <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-l from-[#030303] via-transparent to-[#030303]/80" />
@@ -386,7 +381,7 @@ function Slide4_AI() {
            initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.8 }}
            className="relative w-full z-10 aspect-video md:aspect-auto md:h-[70%] max-w-4xl bg-black rounded-lg md:rounded-[2rem] border border-white/10 shadow-[0_30px_60px_rgba(0,0,0,0.8)] overflow-hidden group/player"
          >
-            <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2000" className="w-full h-full object-cover opacity-80 group-hover/player:scale-105 transition-transform duration-[3s] ease-out" />
+            <img src="/bts11.jpeg" className="w-full h-full object-cover opacity-80 group-hover/player:scale-105 transition-transform duration-[3s] ease-out" />
             
             {/* Play Button Overlay */}
             <div className="absolute inset-0 bg-black/40 group-hover/player:bg-black/20 transition-colors duration-500 flex items-center justify-center">

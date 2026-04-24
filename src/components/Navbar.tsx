@@ -87,10 +87,10 @@ export default function Navbar() {
       >
         <div 
           onClick={() => scrollTo('hero')}
-          className="flex items-center gap-3 font-display text-base sm:text-xl md:text-2xl tracking-wider hover:brightness-125 transition-all cursor-pointer pointer-events-auto group"
+          className="flex items-center gap-3 font-serif text-base sm:text-xl md:text-2xl tracking-wider hover:brightness-125 transition-all cursor-pointer pointer-events-auto group"
         >
-          <AshtaarLogo className="h-8 md:h-10 w-auto group-hover:drop-shadow-[0_0_10px_rgba(212,175,55,0.5)] transition-all" />
-          <span className="drop-shadow-md text-[#D4AF37]">ASHTAAR FILMS</span>
+          <AshtaarLogo className="h-8 md:h-10 w-auto group-hover:drop-shadow-[0_0_10px_rgba(212,175,55,0.5)] transition-all opacity-80 md:opacity-100" />
+          <span className="drop-shadow-md text-[#D4AF37] opacity-90 md:opacity-100">ASHTAAR FILMS</span>
         </div>
 
         <button 
@@ -115,13 +115,13 @@ export default function Navbar() {
           >
             {/* Ambient Background */}
             <div className="absolute inset-0 pointer-events-none opacity-20">
-               <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1598899134739-24c46f58b8c0?q=80&w=2000')] bg-cover bg-center mix-blend-screen grayscale"></div>
+               <div className="absolute inset-0 bg-[url('/bts3.jpeg')] bg-cover bg-center mix-blend-screen grayscale"></div>
                <div className="absolute inset-0 bg-gradient-to-b from-black via-black/80 to-[#050505]"></div>
                <div className="absolute top-1/4 right-1/4 w-[40vw] h-[40vh] bg-[#D4AF37]/10 blur-[120px] rounded-full"></div>
             </div>
 
             <div className="relative z-10 px-6 py-6 md:px-12 flex justify-between items-center">
-              <div className="flex items-center gap-3 font-display text-xl md:text-2xl tracking-wider text-[#D4AF37]">
+              <div className="flex items-center gap-3 font-serif text-xl md:text-2xl tracking-wider text-[#D4AF37]">
                 <AshtaarLogo className="h-8 md:h-10 w-auto" />
                 <span>ASHTAAR FILMS</span>
               </div>
