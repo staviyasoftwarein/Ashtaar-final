@@ -7,8 +7,23 @@ gsap.registerPlugin(ScrollTrigger);
 export default function Hero() {
   const containerRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLHeadingElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
+    const video = videoRef.current;
+    if (video) {
+      // Browsers often block autoplay if not muted, but here it is muted.
+      // We wrap it in a promise check to avoid "interrupted by pause" errors.
+      const playPromise = video.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(e => {
+          if (e.name !== 'AbortError') {
+            console.log("Autoplay prevented:", e);
+          }
+        });
+      }
+    }
+    
     const ctx = gsap.context(() => {
       // Use fromTo to strictly enforce the scale values and prevent state corruption
       gsap.fromTo(textRef.current, 
@@ -35,6 +50,7 @@ export default function Hero() {
     // Moved overflow-hidden to the parent container to prevent page stretch
     <div id="hero" ref={containerRef} className="relative h-screen w-full overflow-hidden bg-black">
       <video 
+        ref={videoRef}
         autoPlay 
         loop 
         muted 
@@ -42,7 +58,7 @@ export default function Hero() {
         // Changed to absolute so it stays inside the Hero section and doesn't break other sections
         className="absolute inset-0 w-full h-full object-cover"
       >
-        <source src="https://videos.pexels.com/video-files/19026925/19026925-uhd_2560_1440_25fps.mp4" type="video/mp4" />
+        <source src="/preloader.mp4" type="video/mp4" />
       </video>
       
       {/* Removed overflow-hidden from here to fix the Safari/WebKit clipping bug */}

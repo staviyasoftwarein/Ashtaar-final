@@ -158,7 +158,7 @@ export default function BehindTheScenes() {
         {images.map((src, i) => (
           <div
             key={i}
-            ref={el => imagesRef.current[i] = el}
+            ref={el => { imagesRef.current[i] = el; }}
             onClick={() => {
               const z = (imagesRef.current[i] as any)?._currentZ || 0;
               // Only allow clicking if the image has moved forward enough (50-60% into screen feel)

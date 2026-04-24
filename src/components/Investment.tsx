@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ArrowLeft, LockKeyhole, Mail, User } from 'lucide-react';
+import { ArrowLeft, Send } from 'lucide-react';
 
 const tiers = [
   { 
@@ -14,7 +14,7 @@ const tiers = [
       "Ashtaar Films investor community access",
       "Production updates and previews"
     ],
-    btnText: "UNLOCK TIER",
+    btnText: "BUILD TOMORROW, TODAY!",
     isDark: false
   },
   { 
@@ -29,7 +29,7 @@ const tiers = [
       "Brand integration opportunities",
       "Priority access on future projects"
     ],
-    btnText: "UNLOCK TIER",
+    btnText: "BUILD TOMORROW, TODAY!",
     isDark: true,
     badge: "MOST POPULAR"
   },
@@ -47,23 +47,36 @@ const tiers = [
       "On-set access + brand integration",
       "Exclusive premiere invitations"
     ],
-    btnText: "UNLOCK TIER",
+    btnText: "BUILD TOMORROW, TODAY!",
     isDark: false
   },
 ];
 
 export default function Investment() {
   const [selectedTier, setSelectedTier] = useState<string | null>(null);
-  const [isUnlocked, setIsUnlocked] = useState(false);
-  const [formData, setFormData] = useState({ name: '', email: '', phone: '' });
+  const [formData, setFormData] = useState({ name: '', email: '', phone: '', message: '' });
+
+  useEffect(() => {
+    if (selectedTier) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [selectedTier]);
 
   const selectedData = selectedTier ? tiers.find(t => t.title === selectedTier) : null;
 
-  const handleUnlock = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (formData.name && formData.email && formData.phone) {
-      setIsUnlocked(true);
-    }
+    // Simulate submission
+    setTimeout(() => {
+       alert("Inquiry submitted successfully!");
+       setSelectedTier(null);
+       setFormData({ name: '', email: '', phone: '', message: '' });
+    }, 500);
   };
 
   return (
@@ -79,18 +92,22 @@ export default function Investment() {
       <motion.div 
         animate={{ x: selectedTier ? '-100%' : '0%' }}
         transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1] }}
-        className="w-full flex-shrink-0 min-h-screen py-32 px-6 md:px-12 flex flex-col items-center"
+        className="w-full flex-shrink-0 min-h-screen py-32 px-6 md:px-12 flex flex-col items-center relative z-10 pt-40"
       >
         <div className="max-w-7xl mx-auto w-full">
-          <div className="mb-20 flex flex-col md:flex-row justify-between items-end border-b border-black/10 pb-8">
+          <div className="mb-16 flex flex-col items-center text-center justify-center border-b border-black/10 pb-12 mt-12 md:mt-0 pt-16 md:pt-0">
             <div>
-              <div className="flex items-center gap-4 mb-4">
-                <span className="w-8 h-[1px] bg-black"></span>
-                <h3 className="text-black uppercase tracking-[0.2em] text-xs font-sans">Menu</h3>
+              <div className="flex items-center justify-center gap-4 mb-6">
+                <span className="w-12 h-[1px] bg-black/20"></span>
+                <h3 className="text-black uppercase tracking-[0.2em] text-xs font-sans">Investment</h3>
+                <span className="w-12 h-[1px] bg-black/20"></span>
               </div>
-              <h2 className="font-sans text-4xl sm:text-5xl md:text-8xl font-medium tracking-tight text-black uppercase">OWN A LEGACY.</h2>
+              <h2 className="font-sans text-4xl sm:text-5xl md:text-6xl font-medium tracking-tight text-black uppercase">
+                "Don't watch the future,<br />
+                <span className="text-[#D4AF37] italic font-serif normal-case">Shape it!"</span>
+              </h2>
             </div>
-            <p className="text-gray-500 text-lg md:text-xl font-sans font-light mt-6 md:mt-0">Three investment tiers. One shared vision.</p>
+            <p className="text-gray-500 text-lg md:text-xl font-sans font-light mt-8">Three investment tiers. One shared vision.</p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 items-stretch">
@@ -108,7 +125,7 @@ export default function Investment() {
                 <div className={`text-xs font-sans mb-4 ${tier.isDark ? 'text-gray-500' : 'text-gray-400'}`}>{tier.num}</div>
                 <h4 className="font-sans text-sm tracking-[0.2em] uppercase font-bold mb-6">{tier.title}</h4>
                 <div className="font-serif text-5xl md:text-6xl mb-4">
-                  {isUnlocked ? tier.price : <span className="opacity-50">₹ ••••••</span>}
+                  
                 </div>
                 <p className={`font-sans italic font-light text-sm mb-10 ${tier.isDark ? 'text-gray-400' : 'text-gray-500'}`}>{tier.subtitle}</p>
                 
@@ -126,8 +143,7 @@ export default function Investment() {
                   onClick={() => setSelectedTier(tier.title)}
                   className={`flex justify-center items-center gap-2 w-full py-4 rounded-lg uppercase tracking-widest text-xs font-bold transition-all duration-300 ${tier.isDark ? 'bg-[#D4AF37] text-black hover:bg-white' : 'bg-transparent border border-black/20 text-black hover:bg-black hover:text-white'}`}
                 >
-                  {!isUnlocked && <LockKeyhole className="w-3 h-3" />}
-                  {isUnlocked ? "REQUEST BRIEFING" : tier.btnText}
+                  {tier.btnText}
                 </button>
               </div>
             ))}
@@ -144,13 +160,15 @@ export default function Investment() {
             exit={{ x: '100%' }}
             transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1] }}
             className="fixed inset-0 w-full h-full bg-[#fcfbf9] z-[100] flex"
+            onWheel={(e) => e.stopPropagation()}
+            onTouchMove={(e) => e.stopPropagation()}
+            data-lenis-prevent="true"
           >
-            {/* Left side: Retaining Investment Details */}
+            {/* Left side: Investment Details */}
             <div className="hidden md:flex w-1/2 relative flex-col justify-center p-16 bg-[#fcfbf9]">
-              <div className={`max-w-md mx-auto w-full transition-all duration-700 ${!isUnlocked ? 'blur-md opacity-40 select-none' : 'blur-0 opacity-100'}`}>
+              <div className="max-w-md mx-auto w-full">
                 <div className="text-gray-400 text-sm font-sans mb-4">{selectedData.num}</div>
                 <h4 className="font-sans text-sm tracking-[0.2em] uppercase font-bold mb-6 text-black">{selectedData.title}</h4>
-                <div className="font-serif text-6xl mb-4 text-black">{isUnlocked ? selectedData.price : "₹ •••"}</div>
                 <p className="font-sans italic font-light text-lg mb-10 text-gray-600">{selectedData.subtitle}</p>
                 
                 <div className="w-full h-px mb-8 bg-black/10"></div>
@@ -163,18 +181,13 @@ export default function Investment() {
                   ))}
                 </ul>
               </div>
-              
-              {!isUnlocked && (
-                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-8 bg-gradient-to-t from-[#fcfbf9] via-transparent">
-                   <LockKeyhole className="w-12 h-12 text-[#D4AF37] mb-6 animate-pulse" />
-                   <h3 className="font-serif text-3xl text-black">Classified Tier</h3>
-                   <p className="text-gray-500 font-sans mt-4 max-w-xs">Pricing and benefits are restricted. Please provide your details to unlock access.</p>
-                 </div>
-              )}
             </div>
 
-            {/* Right side: Form */}
-            <div className="w-full md:w-1/2 bg-[#1a0a0a] p-8 md:p-12 lg:p-20 overflow-y-auto flex flex-col relative shadow-2xl h-full">
+             <div className="w-full md:w-1/2 bg-[#1a0a0a] p-8 md:p-12 lg:p-20 flex flex-col relative shadow-2xl h-full overflow-y-auto"
+                onWheel={(e) => e.stopPropagation()}
+                onTouchMove={(e) => e.stopPropagation()}
+                data-lenis-prevent="true"
+             >
               <button 
                 onClick={() => setSelectedTier(null)}
                 className="w-fit text-[#fff2f2]/50 hover:text-[#D4AF37] transition-colors flex items-center gap-2 font-sans text-xs uppercase tracking-widest mb-8 md:mb-12 shrink-0"
@@ -185,47 +198,36 @@ export default function Investment() {
               <div className="flex-grow flex flex-col justify-center pb-8">
                 <div className="md:hidden mb-10">
                   <h2 className="font-serif text-3xl md:text-4xl text-[#fff2f2] mb-2">{selectedData.title}</h2>
-                  <p className="text-[#D4AF37] font-serif text-xl italic transition-all duration-700">
-                    {isUnlocked ? selectedData.price : "₹ ••••••"}
-                  </p>
                 </div>
 
-                <h3 className="font-serif text-3xl md:text-4xl mb-2 text-[#fff2f2]">
-                  {isUnlocked ? "Investment Application" : "Unlock Access"}
+                <h3 className="font-serif text-3xl md:text-5xl mb-4 text-[#fff2f2]">
+                   MAKE YOUR MARK.
                 </h3>
                 <p className="text-gray-400 font-sans font-light mb-10 text-sm md:text-base">
-                  {isUnlocked ? `Welcome, ${formData.name || 'Investor'}. You may now view all investment tiers. If you are ready to proceed, submit a formal inquiry below.` : "Enter your contact details to reveal pricing and tier benefits instantly."}
+                   Submit your inquiry to partner with us on our upcoming cinematic experiences. We will contact you shortly.
                 </p>
               
-              {!isUnlocked ? (
-                <form onSubmit={handleUnlock} className="space-y-8">
+                <form onSubmit={handleSubmit} className="space-y-6">
                   <div>
-                    <label className="block text-[10px] uppercase tracking-[0.2em] text-[#fff2f2]/50 mb-3 font-sans">Full Name *</label>
-                    <input required type="text" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="w-full bg-transparent border-b border-[#fff2f2]/20 py-3 text-[#fff2f2] font-sans text-lg focus:outline-none focus:border-[#D4AF37] transition-colors" />
+                    <label className="block text-[10px] uppercase tracking-[0.2em] text-[#fff2f2]/50 mb-2 font-sans">Full Name *</label>
+                    <input required type="text" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="w-full bg-transparent border-b border-[#fff2f2]/20 py-2 text-[#fff2f2] font-sans text-lg focus:outline-none focus:border-[#D4AF37] transition-colors" />
                   </div>
                   <div>
-                    <label className="block text-[10px] uppercase tracking-[0.2em] text-[#fff2f2]/50 mb-3 font-sans">Email Address *</label>
-                    <input required type="email" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} className="w-full bg-transparent border-b border-[#fff2f2]/20 py-3 text-[#fff2f2] font-sans text-lg focus:outline-none focus:border-[#D4AF37] transition-colors" />
+                    <label className="block text-[10px] uppercase tracking-[0.2em] text-[#fff2f2]/50 mb-2 font-sans">Email Address *</label>
+                    <input required type="email" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} className="w-full bg-transparent border-b border-[#fff2f2]/20 py-2 text-[#fff2f2] font-sans text-lg focus:outline-none focus:border-[#D4AF37] transition-colors" />
                   </div>
                   <div>
-                    <label className="block text-[10px] uppercase tracking-[0.2em] text-[#fff2f2]/50 mb-3 font-sans">Phone Number *</label>
-                    <input required type="tel" value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})} className="w-full bg-transparent border-b border-[#fff2f2]/20 py-3 text-[#fff2f2] font-sans text-lg focus:outline-none focus:border-[#D4AF37] transition-colors" />
+                    <label className="block text-[10px] uppercase tracking-[0.2em] text-[#fff2f2]/50 mb-2 font-sans">Phone Number *</label>
+                    <input required type="tel" value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})} className="w-full bg-transparent border-b border-[#fff2f2]/20 py-2 text-[#fff2f2] font-sans text-lg focus:outline-none focus:border-[#D4AF37] transition-colors" />
                   </div>
-                  <button type="submit" className="w-full bg-[#D4AF37] text-black px-8 py-5 uppercase tracking-widest text-xs font-bold hover:bg-[#fff2f2] transition-colors mt-8 rounded-lg flex items-center justify-center gap-2">
-                    <LockKeyhole className="w-4 h-4" /> View Pricing
+                  <div>
+                    <label className="block text-[10px] uppercase tracking-[0.2em] text-[#fff2f2]/50 mb-2 font-sans">Message</label>
+                    <textarea value={formData.message} onChange={(e) => setFormData({...formData, message: e.target.value})} placeholder="Tell us about yourself and your interest..." rows={3} className="w-full bg-transparent border-b border-[#fff2f2]/20 py-2 text-[#fff2f2] font-sans text-lg focus:outline-none focus:border-[#D4AF37] transition-colors resize-none"></textarea>
+                  </div>
+                  <button type="submit" className="w-full bg-[#D4AF37] text-black px-8 py-5 uppercase tracking-widest text-xs font-bold hover:bg-white transition-colors mt-8 rounded-lg flex items-center justify-center gap-2">
+                     <Send className="w-4 h-4" /> SUBMIT PARTNERSHIP INQUIRY
                   </button>
                 </form>
-              ) : (
-                <form className="space-y-8 animate-in fade-in duration-700">
-                  <div>
-                    <label className="block text-[10px] uppercase tracking-[0.2em] text-[#fff2f2]/50 mb-3 font-sans">Message / Inquiry</label>
-                    <textarea placeholder="Tell us about yourself and your interest in Ashtaar Films..." rows={4} className="w-full bg-transparent border-b border-[#fff2f2]/20 py-3 text-[#fff2f2] font-sans text-lg focus:outline-none focus:border-[#D4AF37] transition-colors resize-none"></textarea>
-                  </div>
-                  <button type="button" className="w-full bg-white text-black px-8 py-5 uppercase tracking-widest text-xs font-bold hover:bg-[#D4AF37] transition-colors mt-8 rounded-lg">
-                    Submit Formal Inquiry
-                  </button>
-                </form>
-              )}
               </div>
             </div>
           </motion.div>
@@ -234,3 +236,4 @@ export default function Investment() {
     </section>
   );
 }
+

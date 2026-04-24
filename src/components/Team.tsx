@@ -2,8 +2,8 @@ import { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'motion/react';
 
 const team = [
-  { name: "Viraj Dave", role: "Producer", img: "/Producer.jpeg" },
   { name: "Chinmay Naik", role: "Director", img: "/Director.jpeg" },
+  { name: "Viraj Dave", role: "Producer", img: "/Producer.jpeg" },
 ];
 
 export default function Team() {
@@ -59,7 +59,7 @@ export default function Team() {
                 </div>
                 <div className="text-center">
                   <h4 className="font-serif text-2xl md:text-3xl mb-2 text-black">{member.name}</h4>
-                  <p className="text-gray-500 tracking-widest uppercase text-xs font-bold font-sans">{member.role}</p>
+                  <p className="text-gray-500 tracking-widest uppercase text-xs font-extrabold font-sans">{member.role}</p>
                 </div>
               </div>
             ))}

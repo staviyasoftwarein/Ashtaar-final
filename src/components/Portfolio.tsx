@@ -41,15 +41,9 @@ const SectionTitle = ({ num, text }: { num: string, text: string }) => (
     transition={{ delay: 0.1, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
     className="mb-4 md:mb-6 shrink-0 flex flex-col"
   >
-    <div className="font-serif italic text-3xl md:text-5xl lg:text-6xl text-[#D4AF37] mb-2 leading-none">{num}</div>
-    <h2 className="text-5xl sm:text-6xl md:text-7xl lg:text-[6rem] xl:text-[7.5rem] font-black text-white leading-[0.8] tracking-[-0.03em] drop-shadow-2xl uppercase">
-      {text.split(' ').map((word, i, arr) => (
-         <React.Fragment key={i}>
-           {word}
-           {i !== arr.length - 1 && <br className="hidden lg:block" />}
-           {i !== arr.length - 1 && <span className="lg:hidden"> </span>}
-         </React.Fragment>
-      ))}
+    <div className="font-serif italic text-2xl md:text-4xl lg:text-5xl text-[#D4AF37] mb-1 md:mb-2 leading-none">{num}</div>
+    <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white leading-[1.1] tracking-tight drop-shadow-2xl uppercase">
+      {text}
     </h2>
   </motion.div>
 );
@@ -60,10 +54,10 @@ const SectionSubhead = ({ text }: { text: string }) => (
     whileInView={{ opacity: 1, x: 0 }}
     viewport={{ once: true, amount: 0.1 }}
     transition={{ duration: 0.5 }}
-    className="flex items-center gap-3 md:gap-4 mb-4 md:mb-8 shrink-0"
+    className="flex items-center gap-3 md:gap-4 mb-3 md:mb-4 shrink-0"
   >
-    <div className="w-8 md:w-12 h-[2px] bg-white/30"></div>
-    <h3 className="font-mono text-xs md:text-sm lg:text-base tracking-[0.2em] uppercase text-white/80 font-bold whitespace-pre-line leading-snug">{text}</h3>
+    <div className="w-6 md:w-10 h-[2px] bg-white/30"></div>
+    <h3 className="font-mono text-[10px] md:text-xs lg:text-sm tracking-[0.2em] uppercase text-white/70 font-bold whitespace-pre-line leading-snug">{text}</h3>
   </motion.div>
 );
 
@@ -93,41 +87,23 @@ function Slide1_FeatureFilm() {
          
          <div className="relative z-10 w-full h-full flex flex-col justify-center px-6 py-6 md:p-16 lg:p-24 overflow-y-auto custom-scrollbar">
            <SectionTitle num="01" text="Theatrical Release" />
-           <SectionSubhead text="DUSSEHRA" />
-           <SectionDesc>
-             An epic cinematic journey captured flawlessly. A visual masterpiece that redefines storytelling for the modern era. Experience the intensity and grandeur of our latest theatrical release.
-           </SectionDesc>
-           
-           <motion.div 
-             initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.3 }}
-             className="shrink-0"
-           >
-             {!isPlaying ? (
-               <button 
-                 onClick={() => setIsPlaying(true)}
-                 className="group flex items-center gap-4 md:gap-6 w-max cursor-pointer text-white hover:text-[#D4AF37] transition-colors bg-transparent border-0 text-left p-0"
-               >
-                 <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-[#b20710] flex items-center justify-center group-hover:scale-110 group-hover:bg-white group-hover:text-[#b20710] transition-all duration-500 shadow-[0_0_30px_rgba(178,7,16,0.3)] shrink-0">
-                   <Play className="w-4 h-4 md:w-6 md:h-6 ml-1 fill-current" />
-                 </div>
-                 <div>
-                   <div className="font-mono text-[10px] md:text-xs tracking-widest uppercase mb-1 font-bold">Watch Trailer</div>
-                   <div className="text-white/40 text-[10px] flex items-center gap-1 group-hover:text-white/70 transition-colors">
-                     <Youtube className="w-3 h-3" /> YouTube Exclusives
-                   </div>
-                 </div>
-               </button>
-             ) : (
-               <button 
-                 onClick={() => setIsPlaying(false)}
-                 className="group flex items-center gap-4 w-max cursor-pointer text-white hover:text-[#D4AF37] transition-colors bg-transparent border-0 text-left p-0"
-               >
-                   <div className="font-mono text-[10px] md:text-xs tracking-[0.2em] uppercase font-bold border border-white/20 px-6 py-3 rounded-full hover:border-[#D4AF37] hover:bg-white/5 transition-all">
-                       Close Video
-                   </div>
-               </button>
-             )}
-           </motion.div>
+            <SectionSubhead text="DUSSEHRA" />
+            <SectionDesc>
+              An epic cinematic journey captured flawlessly. A visual masterpiece that redefines storytelling for the modern era. Experience the intensity and grandeur of our latest theatrical release.
+            </SectionDesc>
+            
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.3 }}
+              className="shrink-0 flex items-center gap-8"
+            >
+              <button 
+                onClick={() => setIsPlaying(!isPlaying)}
+                className="flex items-center gap-2 uppercase font-mono text-xs tracking-widest font-bold text-white hover:text-[#D4AF37] transition-colors bg-transparent border-none outline-none"
+              >
+                <Play className="w-5 h-5 fill-current" />
+                {isPlaying ? "Close Video" : "Watch Video"}
+              </button>
+            </motion.div>
          </div>
       </div>
 
@@ -173,17 +149,18 @@ function Slide1_FeatureFilm() {
    SLIDE 2: VFX & ANIME 
    ====================================================================== */
 const vfxData = [
-  { id: 'vfx', tag: 'VFX Production', title: 'DEFYING\nREALITY', desc: 'Industry-leading composite structures and CGI pipelines. We manipulate reality at the pixel level to build environments that defy physics.', img: '/bts5.jpeg' },
+  { id: 'vfx', tag: 'VFX Production', title: 'DEFYING\nREALITY', desc: 'Industry-leading composite structures and CGI pipelines. We manipulate reality at the pixel level to build environments that defy physics.', img: '/bts5.jpeg', videoId: 'TB5TRy8MO48' },
   { id: 'anime', tag: 'Anime 2D/3D', title: 'BOUNDLESS\nWORLDS', desc: 'Striking cel-shaded aesthetics blending traditional art with next-gen rigging. Bringing vibrant, culturally rich stories to life.', img: '/bts6.jpeg' }
 ];
 
 function Slide2_VFXAnime() {
   const [active, setActive] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   return (
-    <div className="w-screen h-[100dvh] shrink-0 flex flex-col md:flex-row bg-[#0a0a0a]">
+    <div className="w-screen h-[100dvh] shrink-0 flex flex-col md:flex-row bg-[#080808]">
       {/* Left Intro */}
-      <div className="relative w-full md:w-[45%] lg:w-[40%] h-1/2 md:h-full flex flex-col justify-center border-b md:border-b-0 md:border-r border-white/5 bg-[#0a0a0a] overflow-hidden shrink-0">
+      <div className="relative w-full md:w-[45%] lg:w-[40%] h-1/2 md:h-full flex flex-col justify-center border-b md:border-b-0 md:border-r border-white/5 overflow-hidden shrink-0 bg-[#080808]">
          <TextContainerAmbient watermark="02" glowColor="bg-white" />
          
          <div className="relative z-10 w-full h-full flex flex-col justify-center px-6 py-4 md:p-16 lg:p-24 overflow-y-auto custom-scrollbar">
@@ -195,7 +172,7 @@ function Slide2_VFXAnime() {
           >
             {vfxData.map((d, i) => (
               <button 
-                key={d.id} onClick={() => setActive(i)}
+                key={d.id} onClick={() => { setActive(i); setIsPlaying(false); }}
                 className={`flex items-center gap-2 px-4 py-2 rounded-full text-[10px] md:text-xs tracking-[0.2em] font-mono uppercase transition-all duration-300 border ${active === i ? 'bg-[#D4AF37] text-black border-[#D4AF37] shadow-[0_0_20px_rgba(212,175,55,0.3)]' : 'bg-[#D4AF37]/5 text-[#D4AF37]/70 border-[#D4AF37]/20 hover:bg-[#D4AF37]/10 hover:border-[#D4AF37] hover:text-[#D4AF37]'}`}
               >
                 {active === i && <Sparkles className="w-3 h-3" />}
@@ -204,16 +181,35 @@ function Slide2_VFXAnime() {
             ))}
           </motion.div>
 
-          <div className="min-h-[140px] md:min-h-[200px]">
+          <div className="min-h-[140px] md:min-h-[220px] shrink-0 flex flex-col">
             <AnimatePresence mode="wait">
               <motion.div 
                 key={active}
                 initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }} transition={{ duration: 0.3 }}
+                className="flex flex-col"
               >
                 <SectionSubhead text={vfxData[active].title} />
-                <p className="text-white/50 text-xs md:text-base lg:text-lg max-w-md font-light leading-relaxed">
+                <p className="text-white/50 text-xs md:text-base lg:text-lg max-w-md font-light leading-relaxed mb-6 md:mb-8">
                   {vfxData[active].desc}
                 </p>
+                
+                {vfxData[active].videoId ? (
+                  <div className="shrink-0 flex flex-wrap items-center gap-8">
+                    <button 
+                      onClick={() => setIsPlaying(!isPlaying)}
+                      className="flex items-center gap-2 uppercase font-mono text-xs tracking-widest font-bold text-white hover:text-[#D4AF37] transition-colors bg-transparent border-none outline-none"
+                    >
+                      <Play className="w-5 h-5 fill-current" />
+                      {isPlaying ? "Close Video" : "Watch Video"}
+                    </button>
+                    <button 
+                      className="flex items-center gap-2 uppercase font-mono text-xs tracking-widest font-bold text-white hover:text-[#D4AF37] transition-colors bg-transparent border-none outline-none"
+                    >
+                      <Play className="w-5 h-5 fill-current" />
+                      VFX Showcase
+                    </button>
+                  </div>
+                ) : null}
               </motion.div>
             </AnimatePresence>
           </div>
@@ -221,16 +217,50 @@ function Slide2_VFXAnime() {
       </div>
 
       {/* Right Media */}
-      <div className="w-full md:w-[55%] lg:w-[60%] h-1/2 md:h-full relative overflow-hidden bg-[#111]">
+      <div className="w-full md:w-[55%] lg:w-[60%] h-1/2 md:h-full relative overflow-hidden bg-[#111] flex items-center justify-center p-4 md:p-12 lg:p-24">
+         {/* Subtle overlay ambient underneath the media */}
+         <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-l from-[#080808]/80 via-transparent to-transparent pointer-events-none" />
+         
          <AnimatePresence mode="wait">
-           <motion.img 
+           <motion.div
              key={active}
-             src={vfxData[active].img}
-             initial={{ opacity: 0, scale: 1.05 }} animate={{ opacity: 0.7, scale: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.8 }}
-             className="absolute inset-0 w-full h-full object-cover"
-           />
+             initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 1.05 }} transition={{ duration: 0.6 }}
+             className="w-full max-w-4xl aspect-video relative z-10 rounded-xl md:rounded-[1rem] lg:rounded-[2rem] overflow-hidden bg-black shadow-[0_30px_60px_rgba(0,0,0,0.8)] border border-white/10 group/player"
+           >
+             {vfxData[active].videoId ? (
+               isPlaying ? (
+                 <iframe 
+                   src={`https://www.youtube.com/embed/${vfxData[active].videoId}?autoplay=1&mute=1&controls=1&rel=0`}
+                   className="w-full h-full border-0 absolute inset-0 text-white"
+                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                   allowFullScreen
+                 />
+               ) : (
+                 <>
+                   <img 
+                     src={`https://img.youtube.com/vi/${vfxData[active].videoId}/maxresdefault.jpg`}
+                     alt={vfxData[active].title}
+                     className="w-full h-full object-cover opacity-80 group-hover/player:scale-105 transition-transform duration-[2s] ease-out" 
+                   />
+                   <div 
+                     className="absolute inset-0 bg-black/20 group-hover/player:bg-black/10 transition-colors duration-500 flex items-center justify-center cursor-pointer"
+                     onClick={() => setIsPlaying(true)}
+                   >
+                     <div className="w-16 h-16 md:w-24 md:h-24 bg-white/10 backdrop-blur-md rounded-full border border-white/20 flex items-center justify-center group-hover/player:bg-white group-hover/player:text-black transition-all duration-500 shadow-[0_0_40px_rgba(255,255,255,0.1)] group-hover/player:shadow-[0_0_50px_rgba(255,255,255,0.4)]">
+                       <Play className="w-6 h-6 md:w-10 md:h-10 ml-1 text-white fill-current opacity-90 transition-colors" />
+                     </div>
+                   </div>
+                 </>
+               )
+             ) : (
+               <img 
+                 src={vfxData[active].img}
+                 alt={vfxData[active].title}
+                 className="w-full h-full object-cover opacity-80 hover:scale-105 transition-transform duration-[2s] ease-out" 
+               />
+             )}
+           </motion.div>
          </AnimatePresence>
-         <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-[#0a0a0a]/80 via-transparent to-transparent pointer-events-none" />
       </div>
     </div>
   );
@@ -266,12 +296,11 @@ function Slide3_Music() {
          <TextContainerAmbient watermark="03" glowColor="bg-[#FF0000]/20" />
          
          <div className="relative z-10 w-full h-full flex flex-col justify-center px-6 py-6 md:p-16 lg:p-24 overflow-y-auto custom-scrollbar">
-           <SectionTitle num="03" text="The Playlist" />
-           <SectionSubhead text="ASHTAAR MUSIC PRODUCTION" />
+           <SectionTitle num="03" text="ASHTAAR MUSIC PRODUCTION" />
            
-           <div className="flex flex-col xl:flex-row items-center xl:items-start gap-6 md:gap-8 mb-8 mt-2 shrink-0 w-full">
+           <div className="flex flex-col items-center gap-4 mb-6 mt-4 shrink-0 w-full max-w-sm md:max-w-md mx-auto md:mx-0">
               <motion.div 
-                className="w-40 h-40 md:w-56 md:h-56 lg:w-64 lg:h-64 rounded-full shadow-[0_20px_50px_rgba(0,0,0,0.8)] border-[4px] md:border-[6px] border-[#050505] overflow-hidden shrink-0 relative"
+                className="w-48 h-48 md:w-64 md:h-64 rounded-full shadow-[0_20px_50px_rgba(0,0,0,0.8)] border-[4px] md:border-[6px] border-[#050505] overflow-hidden shrink-0 relative"
                 animate={{ rotate: 360 }} transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
               >
                  <img src={thumb} className="w-full h-full object-cover scale-125" />
@@ -279,13 +308,13 @@ function Slide3_Music() {
                     <div className="w-2 h-2 bg-black rounded-full"></div>
                  </div>
               </motion.div>
-              <div className="min-w-0 text-center xl:text-left xl:mt-8 w-full max-w-sm">
+              <div className="min-w-0 text-center w-full mt-2">
                 <h4 className="text-white font-bold text-xl md:text-2xl mb-1 md:mb-2 truncate">{track.title}</h4>
                 <p className="text-[#FF0000] font-mono text-[10px] md:text-xs uppercase tracking-widest truncate">{track.artist}</p>
               </div>
            </div>
 
-           <motion.div initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="shrink-0">
+           <motion.div initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="shrink-0 flex justify-center w-full max-w-sm md:max-w-md mx-auto md:mx-0">
              <a 
                href={`https://youtu.be/${track.id}`} target="_blank" rel="noreferrer"
                className="flex items-center justify-center gap-2 md:gap-3 w-full max-w-xs bg-white text-black py-3 md:py-4 rounded-full hover:bg-[#FF0000] hover:text-white transition-colors font-bold text-xs md:text-sm tracking-wide shadow-xl group"
@@ -345,6 +374,8 @@ function Slide3_Music() {
    SLIDE 4: AI ANIMATION
    ====================================================================== */
 function Slide4_AI() {
+  const [isPlaying, setIsPlaying] = useState(false);
+
   return (
     <div className="w-screen h-[100dvh] shrink-0 flex flex-col md:flex-row bg-[#080808]">
       {/* Left Intro */}
@@ -358,10 +389,19 @@ function Slide4_AI() {
               Harnessing generative latent diffusion and custom computational pipelines. We synthesize impossible visual architectures to pioneer the absolute cutting edge of digital storytelling.
            </SectionDesc>
            
-           <motion.div initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.3 }} className="shrink-0">
-             <button className="flex items-center gap-3 bg-white/5 hover:bg-white hover:text-black border border-white/20 text-white px-5 md:px-8 py-3 md:py-4 rounded-full transition-all duration-500 group">
-                <Cpu className="w-4 h-4 md:w-5 md:h-5 group-hover:text-[#D4AF37] transition-colors" />
-                <span className="text-[10px] md:text-xs tracking-[0.2em] font-mono uppercase font-bold">Watch Showcase</span>
+           <motion.div initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.3 }} className="shrink-0 flex flex-wrap items-center gap-8">
+             <button 
+               onClick={() => setIsPlaying(!isPlaying)}
+               className="flex items-center gap-2 uppercase font-mono text-xs tracking-widest font-bold text-white hover:text-[#D4AF37] transition-colors bg-transparent border-none outline-none"
+             >
+               <Play className="w-5 h-5 fill-current" />
+               {isPlaying ? "Close Video" : "Watch Video"}
+             </button>
+             <button 
+               className="flex items-center gap-2 uppercase font-mono text-xs tracking-widest font-bold text-white hover:text-[#D4AF37] transition-colors bg-transparent border-none outline-none"
+             >
+               <Play className="w-5 h-5 fill-current" />
+               AI Animation
              </button>
            </motion.div>
          </div>
@@ -371,7 +411,7 @@ function Slide4_AI() {
       <div className="w-full md:w-[55%] lg:w-[60%] h-1/2 md:h-full relative overflow-hidden bg-[#000] flex items-center justify-center p-4 md:p-12">
          {/* Background generative feel */}
          <img 
-           src="/bts12.jpeg" 
+           src="https://img.youtube.com/vi/CQiuxa2T9Ts/maxresdefault.jpg" 
            className="absolute inset-0 w-full h-full object-cover opacity-30 blur-sm scale-110" 
          />
          <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-l from-[#030303] via-transparent to-[#030303]/80" />
@@ -381,25 +421,36 @@ function Slide4_AI() {
            initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.8 }}
            className="relative w-full z-10 aspect-video md:aspect-auto md:h-[70%] max-w-4xl bg-black rounded-lg md:rounded-[2rem] border border-white/10 shadow-[0_30px_60px_rgba(0,0,0,0.8)] overflow-hidden group/player"
          >
-            <img src="/bts11.jpeg" className="w-full h-full object-cover opacity-80 group-hover/player:scale-105 transition-transform duration-[3s] ease-out" />
-            
-            {/* Play Button Overlay */}
-            <div className="absolute inset-0 bg-black/40 group-hover/player:bg-black/20 transition-colors duration-500 flex items-center justify-center">
-               <div className="w-12 h-12 md:w-24 md:h-24 bg-white/10 backdrop-blur-md rounded-full border border-white/20 flex items-center justify-center group-hover/player:bg-white group-hover/player:text-black transition-all duration-500 cursor-pointer shadow-[0_0_40px_rgba(255,255,255,0.1)] group-hover/player:shadow-[0_0_50px_rgba(255,255,255,0.4)]">
-                  <Play className="w-5 h-5 md:w-10 md:h-10 ml-1 text-white group-hover/player:text-black fill-current transition-colors" />
-               </div>
-            </div>
+            {isPlaying ? (
+              <iframe 
+                src="https://www.youtube.com/embed/CQiuxa2T9Ts?autoplay=1&mute=1&controls=1&rel=0&showinfo=0"
+                className="absolute inset-0 w-full h-full text-white"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            ) : (
+              <>
+                <img src="https://img.youtube.com/vi/CQiuxa2T9Ts/maxresdefault.jpg" className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover/player:scale-105 transition-transform duration-[3s] ease-out" />
+                
+                {/* Play Button Overlay */}
+                <div onClick={() => setIsPlaying(true)} className="absolute inset-0 bg-black/40 group-hover/player:bg-black/20 transition-colors duration-500 flex items-center justify-center">
+                   <div className="w-12 h-12 md:w-24 md:h-24 bg-white/10 backdrop-blur-md rounded-full border border-white/20 flex items-center justify-center group-hover/player:bg-white group-hover/player:text-black transition-all duration-500 cursor-pointer shadow-[0_0_40px_rgba(255,255,255,0.1)] group-hover/player:shadow-[0_0_50px_rgba(255,255,255,0.4)]">
+                      <Play className="w-5 h-5 md:w-10 md:h-10 ml-1 text-white group-hover/player:text-black fill-current transition-colors" />
+                   </div>
+                </div>
 
-            {/* Video Player UI Scaffolding */}
-            <div className="absolute bottom-0 left-0 w-full p-3 md:p-6 bg-gradient-to-t from-black to-transparent opacity-0 group-hover/player:opacity-100 transition-opacity duration-500 flex items-end justify-between">
-               <div className="flex items-center gap-2 md:gap-3">
-                  <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-[#D4AF37] animate-pulse"></div>
-                  <span className="font-mono text-[8px] md:text-[10px] text-white/70 uppercase tracking-widest">Sys_Render_Live</span>
-               </div>
-               <div className="w-1/2 h-0.5 md:h-1 bg-white/20 rounded-full overflow-hidden">
-                  <div className="w-1/3 h-full bg-white"></div>
-               </div>
-            </div>
+                {/* Video Player UI Scaffolding */}
+                <div className="absolute bottom-0 left-0 w-full p-3 md:p-6 bg-gradient-to-t from-black to-transparent opacity-0 group-hover/player:opacity-100 transition-opacity duration-500 flex items-end justify-between pointer-events-none">
+                   <div className="flex items-center gap-2 md:gap-3">
+                      <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-[#D4AF37] animate-pulse"></div>
+                      <span className="font-mono text-[8px] md:text-[10px] text-white/70 uppercase tracking-widest">Sys_Render_Live</span>
+                   </div>
+                   <div className="w-1/2 h-0.5 md:h-1 bg-white/20 rounded-full overflow-hidden">
+                      <div className="w-1/3 h-full bg-white"></div>
+                   </div>
+                </div>
+              </>
+            )}
          </motion.div>
       </div>
     </div>
