@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Menu, X, ArrowRight, Instagram, Twitter, Linkedin, Youtube } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const AshtaarLogo = ({ className = "h-8 w-auto" }) => (
   <svg viewBox="600 0 400 820" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
@@ -13,12 +14,14 @@ const AshtaarLogo = ({ className = "h-8 w-auto" }) => (
 );
 
 const navItems = [
+  { name: 'Our Portfolio', id: 'portfolio', subtitle: 'Our Legacy' },
+  { name: 'The Story', id: 'story', subtitle: 'Our Vision', isRoute: true },
+  { name: 'Testimonials', id: 'testimonials', subtitle: 'Client Words' },
   { name: 'Behind the Lens', id: 'team', subtitle: 'The Visionaries' },
   { name: 'Behind the Scenes', id: 'bts', subtitle: 'The Process' },
-  { name: 'Our Portfolio', id: 'portfolio', subtitle: 'Our Legacy' },
-  { name: 'Testimonials', id: 'testimonials', subtitle: 'Client Words' },
   { name: 'Investment', id: 'investment', subtitle: 'Work With Us' },
   { name: 'Careers', id: 'careers', subtitle: 'Join The Cult' },
+  { name: 'The Journal', id: 'blog', subtitle: 'Cinematic Insights' },
 ];
 
 export default function Navbar() {
@@ -27,22 +30,21 @@ export default function Navbar() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     setIsLoaded(true);
 
     const handleScroll = () => {
-      // Hide immediately on scroll
       if (window.scrollY > 50) {
         setIsVisible(false);
       }
 
-      // Clear any existing timeout
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
 
-      // Set timeout to show after 1.5 seconds of pause
       timeoutRef.current = setTimeout(() => {
         setIsVisible(true);
       }, 1500);
@@ -50,28 +52,35 @@ export default function Navbar() {
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     
-    // Initial check
-    if (window.scrollY > 50) {
-      setIsVisible(false);
-      timeoutRef.current = setTimeout(() => {
-        setIsVisible(true);
-      }, 1500);
-    }
-
     return () => {
       window.removeEventListener('scroll', handleScroll);
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
   }, []);
 
-  const scrollTo = (id: string) => {
+  const scrollTo = (id: string, isRoute?: boolean) => {
     setIsOpen(false);
+    
+    if (isRoute) {
+      setTimeout(() => navigate(`/${id}`), 600);
+      return;
+    }
+
+    if (location.pathname !== '/') {
+      navigate('/');
+      setTimeout(() => {
+        const el = document.getElementById(id);
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+      }, 700);
+      return;
+    }
+
     setTimeout(() => {
       const el = document.getElementById(id);
       if (el) {
         el.scrollIntoView({ behavior: 'smooth' });
       }
-    }, 600); // Wait for menu close animation
+    }, 600);
   };
 
   return (
@@ -86,7 +95,10 @@ export default function Navbar() {
         className="fixed top-0 left-0 w-full z-50 px-6 py-6 md:px-12 flex justify-between items-center text-white pointer-events-none drop-shadow-xl"
       >
         <div 
-          onClick={() => scrollTo('hero')}
+          onClick={() => {
+            if (location.pathname !== '/') navigate('/');
+            else window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
           className="flex items-center gap-3 font-serif text-base sm:text-xl md:text-2xl tracking-wider hover:brightness-125 transition-all cursor-pointer pointer-events-auto group"
         >
           <AshtaarLogo className="h-8 md:h-10 w-auto group-hover:drop-shadow-[0_0_10px_rgba(212,175,55,0.5)] transition-all opacity-80 md:opacity-100" />
@@ -121,7 +133,14 @@ export default function Navbar() {
             </div>
 
             <div className="relative z-10 px-6 py-6 md:px-12 flex justify-between items-center">
-              <div className="flex items-center gap-3 font-serif text-xl md:text-2xl tracking-wider text-[#D4AF37]">
+              <div 
+                onClick={() => {
+                  setIsOpen(false);
+                  if (location.pathname !== '/') navigate('/');
+                  else window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                className="flex items-center gap-3 font-serif text-xl md:text-2xl tracking-wider text-[#D4AF37] cursor-pointer hover:brightness-125 transition-all"
+              >
                 <AshtaarLogo className="h-8 md:h-10 w-auto" />
                 <span>ASHTAAR FILMS</span>
               </div>
@@ -145,7 +164,7 @@ export default function Navbar() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -20 }}
                     transition={{ delay: 0.1 + i * 0.08, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                    onClick={() => scrollTo(item.id)}
+                    onClick={() => scrollTo(item.id, item.isRoute)}
                     onMouseEnter={() => setHoveredItem(item.id)}
                     onMouseLeave={() => setHoveredItem(null)}
                     className="group relative w-full flex flex-col md:flex-row md:items-center justify-between text-left py-3 md:py-4 border-b border-white/5 hover:border-white/20 transition-colors shrink-0"

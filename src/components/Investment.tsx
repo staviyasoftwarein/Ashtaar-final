@@ -55,10 +55,13 @@ const tiers = [
 export default function Investment() {
   const [selectedTier, setSelectedTier] = useState<string | null>(null);
   const [formData, setFormData] = useState({ name: '', email: '', phone: '', message: '' });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<null | 'success' | 'error'>(null);
 
   useEffect(() => {
     if (selectedTier) {
       document.body.style.overflow = 'hidden';
+      setSubmitStatus(null);
     } else {
       document.body.style.overflow = 'unset';
     }
@@ -71,12 +74,25 @@ export default function Investment() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulate submission
+    if (!formData.name || !formData.email || !formData.phone) {
+      setSubmitStatus('error');
+      return;
+    }
+    if (!/^\S+@\S+\.\S+$/.test(formData.email)) {
+      setSubmitStatus('error');
+      return;
+    }
+    
+    setIsSubmitting(true);
+    // Simulate API submission
     setTimeout(() => {
-       alert("Inquiry submitted successfully!");
-       setSelectedTier(null);
+       setIsSubmitting(false);
+       setSubmitStatus('success');
        setFormData({ name: '', email: '', phone: '', message: '' });
-    }, 500);
+       setTimeout(() => {
+         setSelectedTier(null);
+       }, 2000);
+    }, 1000);
   };
 
   return (
@@ -208,24 +224,37 @@ export default function Investment() {
                 </p>
               
                 <form onSubmit={handleSubmit} className="space-y-6">
+                  <input type="hidden" name="csrf_token" value="mock-csrf-token-xyz789" />
+                  
+                  {submitStatus === 'success' && (
+                    <div className="bg-green-500/20 border border-green-500/50 text-green-300 px-4 py-3 rounded text-sm mb-6 font-mono">
+                      Inquiry successfully securely submitted. We will contact you soon.
+                    </div>
+                  )}
+                  {submitStatus === 'error' && (
+                    <div className="bg-red-500/20 border border-red-500/50 text-red-300 px-4 py-3 rounded text-sm mb-6 font-mono">
+                      Please review the fields. Ensure a valid email and required information are provided.
+                    </div>
+                  )}
+
                   <div>
                     <label className="block text-[10px] uppercase tracking-[0.2em] text-[#fff2f2]/50 mb-2 font-sans">Full Name *</label>
-                    <input required type="text" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="w-full bg-transparent border-b border-[#fff2f2]/20 py-2 text-[#fff2f2] font-sans text-lg focus:outline-none focus:border-[#D4AF37] transition-colors" />
+                    <input required type="text" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value.replace(/</g, "")})} className="w-full bg-transparent border-b border-[#fff2f2]/20 py-2 text-[#fff2f2] font-sans text-lg focus:outline-none focus:border-[#D4AF37] transition-colors" />
                   </div>
                   <div>
                     <label className="block text-[10px] uppercase tracking-[0.2em] text-[#fff2f2]/50 mb-2 font-sans">Email Address *</label>
-                    <input required type="email" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} className="w-full bg-transparent border-b border-[#fff2f2]/20 py-2 text-[#fff2f2] font-sans text-lg focus:outline-none focus:border-[#D4AF37] transition-colors" />
+                    <input required type="email" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value.replace(/</g, "")})} className="w-full bg-transparent border-b border-[#fff2f2]/20 py-2 text-[#fff2f2] font-sans text-lg focus:outline-none focus:border-[#D4AF37] transition-colors" />
                   </div>
                   <div>
                     <label className="block text-[10px] uppercase tracking-[0.2em] text-[#fff2f2]/50 mb-2 font-sans">Phone Number *</label>
-                    <input required type="tel" value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})} className="w-full bg-transparent border-b border-[#fff2f2]/20 py-2 text-[#fff2f2] font-sans text-lg focus:outline-none focus:border-[#D4AF37] transition-colors" />
+                    <input required type="tel" value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value.replace(/</g, "")})} className="w-full bg-transparent border-b border-[#fff2f2]/20 py-2 text-[#fff2f2] font-sans text-lg focus:outline-none focus:border-[#D4AF37] transition-colors" />
                   </div>
                   <div>
                     <label className="block text-[10px] uppercase tracking-[0.2em] text-[#fff2f2]/50 mb-2 font-sans">Message</label>
-                    <textarea value={formData.message} onChange={(e) => setFormData({...formData, message: e.target.value})} placeholder="Tell us about yourself and your interest..." rows={3} className="w-full bg-transparent border-b border-[#fff2f2]/20 py-2 text-[#fff2f2] font-sans text-lg focus:outline-none focus:border-[#D4AF37] transition-colors resize-none"></textarea>
+                    <textarea value={formData.message} onChange={(e) => setFormData({...formData, message: e.target.value.replace(/</g, "")})} placeholder="Tell us about yourself and your interest..." rows={3} className="w-full bg-transparent border-b border-[#fff2f2]/20 py-2 text-[#fff2f2] font-sans text-lg focus:outline-none focus:border-[#D4AF37] transition-colors resize-none"></textarea>
                   </div>
-                  <button type="submit" className="w-full bg-[#D4AF37] text-black px-8 py-5 uppercase tracking-widest text-xs font-bold hover:bg-white transition-colors mt-8 rounded-lg flex items-center justify-center gap-2">
-                     <Send className="w-4 h-4" /> SUBMIT PARTNERSHIP INQUIRY
+                  <button type="submit" disabled={isSubmitting} className={`w-full bg-[#D4AF37] text-black px-8 py-5 uppercase tracking-widest text-xs font-bold hover:bg-white transition-colors mt-8 rounded-lg flex items-center justify-center gap-2 ${isSubmitting ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer'}`}>
+                     {isSubmitting ? 'SUBMITTING...' : <><Send className="w-4 h-4" /> SUBMIT PARTNERSHIP INQUIRY</>}
                   </button>
                 </form>
               </div>

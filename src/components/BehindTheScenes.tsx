@@ -77,7 +77,7 @@ export default function BehindTheScenes() {
       const screenHeight = window.innerHeight;
       const screenWidth = window.innerWidth;
       const isMobile = screenWidth < 800;
-      const spread = isMobile ? 1.0 : 0.9;
+      const spread = isMobile ? 1.4 : 1.2;
 
       // Set initial state
       imgs.forEach((img) => {
@@ -98,7 +98,7 @@ export default function BehindTheScenes() {
           start: "top top",
           end: `+=${screenHeight * 4}px`,
           pin: true,
-          scrub: 1.2, // Smooth scrubbing
+          scrub: 1.8, // Increased smoothness
         }
       });
 
@@ -108,13 +108,14 @@ export default function BehindTheScenes() {
         
         let targetX = pos.x * screenWidth * spread;
         let targetY = pos.y * screenHeight * spread;
-        let targetZ = 1800;
-        let targetScale = 1;
+        let targetZ = 2200; // Increased to ensure it flies past the camera
+        let targetScale = 1.2;
 
         if (isLast) {
           targetX = 0;
           targetY = 0;
-          targetZ = 600; // Leave the last one visible and readable
+          targetZ = 1200; // Brought closer to fill the screen (perspective is 2000px)
+          targetScale = 1.1;
         }
 
         tl.to(img, {
@@ -123,14 +124,13 @@ export default function BehindTheScenes() {
           z: targetZ,
           scale: targetScale,
           autoAlpha: 1,
-          ease: "none", // Using "none" instead of power1 for smoother constant movement
+          ease: "power2.inOut", 
           duration: 1,
           onUpdate: function() {
-            // Store current z depth for click detection
             const currentZ = gsap.getProperty(img, "z") as number;
             (img as any)._currentZ = currentZ;
           }
-        }, index * 0.1); // Stagger tightly
+        }, index * 0.08); // Tighter stagger for smoother "tunnel" feel
       });
 
     }, containerRef);
@@ -166,7 +166,7 @@ export default function BehindTheScenes() {
                 setSelectedGalleryIndex(i);
               }
             }}
-            className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[190px] md:w-[500px] md:h-[350px] cursor-pointer pointer-events-auto group ${i === images.length - 1 ? 'after:content-[""] after:absolute after:inset-0 after:bg-black/40' : ''}`}
+            className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] h-[60vw] md:w-[75vw] md:h-[42vw] max-w-[1400px] max-h-[800px] cursor-pointer pointer-events-auto group ${i === images.length - 1 ? 'after:content-[""] after:absolute after:inset-0 after:bg-black/30' : ''}`}
           >
             <img 
               src={src} 

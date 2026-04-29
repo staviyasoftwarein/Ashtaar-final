@@ -1,206 +1,242 @@
-import { useEffect, useRef, useState } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { VolumeX, Volume2 } from 'lucide-react';
+import { useRef, useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import { VolumeX, Volume2, Play, Quote, ChevronLeft, ChevronRight } from 'lucide-react';
 
-gsap.registerPlugin(ScrollTrigger);
-
-const pressItems = [
-  { img: "/Testimonial1.jpeg" },
-  { img: "/Testimonial2.jpeg" },
-  { img: "/Testimonial3.jpeg" },
-  { img: "/Testimonial4.jpeg" },
+const testimonials = [
+  {
+    type: 'video',
+    src: "/TestiVideo1.mp4",
+    quote: "They brought our cinematic vision to life with zero compromise. The process was as artistic as the result.",
+    author: "Elena Vance",
+    role: "Production Lead, Aether Studios",
+    thumbnail: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    type: 'image',
+    src: "/Testimonial1.jpeg",
+    quote: "ASHTAAR doesn't just film; they capture the soul of the narrative. A truly world-class experience.",
+    author: "Marcus Thorne",
+    role: "Creative Director",
+    thumbnail: "/Testimonial1.jpeg"
+  },
+  {
+    type: 'video',
+    src: "/TestiVideo2.mp4",
+    quote: "A seamless, breathtaking production process from day one. Their attention to detail is frightening.",
+    author: "Sarah Jenkins",
+    role: "Executive Producer",
+    thumbnail: "https://images.unsplash.com/photo-1492691523567-6170c81efc30?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    type: 'image',
+    src: "/Testimonial2.jpeg",
+    quote: "The visual fidelity they achieved exceeded our wildest expectations. Pure cinematic magic.",
+    author: "David Chen",
+    role: "Independent Filmmaker",
+    thumbnail: "/Testimonial2.jpeg"
+  },
+  {
+    type: 'video',
+    src: "/TestiVideo3.mp4",
+    quote: "The final cut was an absolute masterpiece. They understood the rhythm of our story perfectly.",
+    author: "Julian Ross",
+    role: "Showrunner",
+    thumbnail: "https://images.unsplash.com/photo-1533619043845-dfc67753b820?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    type: 'image',
+    src: "/Testimonial3.jpeg",
+    quote: "Innovation meets tradition. ASHTAAR is the future of digital storytelling.",
+    author: "Aria Montgomery",
+    role: "Marketing Head",
+    thumbnail: "/Testimonial3.jpeg"
+  }
 ];
-
-const videoItems = [
-  { video: "/TestiVideo1.mp4", quote: "They brought our cinematic vision to life with zero compromise." },
-  { video: "/TestiVideo2.mp4", quote: "A seamless, breathtaking production process from day one." },
-  { video: "/TestiVideo3.mp4", quote: "The final cut was an absolute masterpiece." },
-  { video: "/TestiVideo4.mp4", quote: "The most brilliant set crew we've ever worked with." },
-];
-
-const pressRotations = [-4, 2, -1, 3];
-const videoRotations = [3, -2, 4, -1];
 
 export default function Testimonials() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const pressCardsRef = useRef<(HTMLDivElement | null)[]>([]);
-  const videoCardsRef = useRef<(HTMLDivElement | null)[]>([]);
-  const videoRefs = useRef<(HTMLVideoElement | null)[]>(Array(4).fill(null));
-  
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [userUnmuted, setUserUnmuted] = useState<boolean[]>(Array(4).fill(false));
-  const [sectionVisible, setSectionVisible] = useState(false);
+  const [index, setIndex] = useState(0);
+  const [isMuted, setIsMuted] = useState(true);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [direction, setDirection] = useState(0);
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(([entry]) => {
-      setSectionVisible(entry.isIntersecting);
-    }, { threshold: 0.1 });
-    if (containerRef.current) observer.observe(containerRef.current);
-    return () => observer.disconnect();
-  }, []);
+  const next = () => {
+    setDirection(1);
+    setIndex((prev) => (prev + 1) % testimonials.length);
+  };
 
-  useEffect(() => {
-    videoRefs.current.forEach((video) => {
-      if (!video) return;
-      if (sectionVisible) {
-        const playPromise = video.play();
-        if (playPromise !== undefined) {
-          playPromise.catch(e => {
-            if (e.name !== 'AbortError') {
-              console.log("Testimonial video play prevented:", e);
-            }
-          });
-        }
-      } else {
-        video.pause();
-      }
-    });
-  }, [sectionVisible]);
-
-  const toggleMute = (index: number) => {
-    setUserUnmuted(prev => {
-      const next = [...prev];
-      next[index] = !next[index];
-      return next;
-    });
+  const prev = () => {
+    setDirection(-1);
+    setIndex((prev) => (prev - 1 + testimonials.length) % testimonials.length);
   };
 
   useEffect(() => {
-    let latestActive = 0;
-    const ctx = gsap.context(() => {
-      const pCards = pressCardsRef.current;
-      const vCards = videoCardsRef.current;
-      
-      // Set initial states
-      gsap.set(pCards, {
-        y: () => window.innerHeight,
-        rotation: 0,
-        opacity: 0,
-      });
-      gsap.set(vCards, {
-        y: () => window.innerHeight,
-        rotation: 0,
-        opacity: 0,
-      });
+    if (videoRef.current) {
+      videoRef.current.currentTime = 0;
+      videoRef.current.play().catch(() => {});
+    }
+  }, [index]);
 
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: "top top",
-          end: `+=${window.innerHeight * 3}`,
-          pin: true,
-          scrub: 1,
-          onUpdate: (self) => {
-            const time = self.progress * 2.5;
-            let active = 0;
-            if (time >= 0.8 && time < 1.3) active = 1;
-            else if (time >= 1.3 && time < 1.8) active = 2;
-            else if (time >= 1.8) active = 3;
-            
-            if (active !== latestActive) {
-              latestActive = active;
-              setActiveIndex(active);
-            }
-          }
-        }
-      });
-
-      pCards.forEach((card, i) => {
-        tl.to(card, {
-          y: 0,
-          opacity: 1,
-          rotation: pressRotations[i],
-          duration: 1,
-          ease: "power2.out",
-        }, i * 0.5); // Staggered entrance
-      });
-
-      vCards.forEach((card, i) => {
-        tl.to(card, {
-          y: 0,
-          opacity: 1,
-          rotation: videoRotations[i],
-          duration: 1,
-          ease: "power2.out",
-        }, i * 0.5); // Sync with press cards
-      });
-    }, containerRef);
-
-    return () => ctx.revert();
-  }, []);
+  const current = testimonials[index];
 
   return (
-    <div id="testimonials" ref={containerRef} className="min-h-screen bg-[#f5f0eb] relative overflow-hidden z-20 flex flex-col items-center justify-start pt-12 md:pt-24 lg:pt-32">
-      {/* Background Texture */}
-      <div className="absolute inset-0 pointer-events-none z-0">
-        <div className="absolute inset-0 bg-[#f5f0eb]"></div>
-        <div className="absolute inset-0 opacity-[0.04] mix-blend-multiply bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,_rgba(212,175,55,0.1),_transparent_70%)]"></div>
+    <section id="testimonials" className="min-h-screen bg-[#fafaf9] text-gray-900 py-24 md:py-32 relative overflow-hidden flex flex-col justify-center">
+      {/* Background Decor */}
+      <div className="absolute inset-0 opacity-40 pointer-events-none">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150%] h-[150%] bg-[radial-gradient(circle_at_center,_#D4AF3710_0%,_transparent_70%)]"></div>
+        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.05] mix-blend-multiply"></div>
       </div>
 
-      <div className="relative w-full text-center z-10 px-4 mb-4 md:mb-16 shrink-0">
-        <h2 className="font-serif text-3xl md:text-5xl lg:text-7xl text-black">They said <span className="text-[#D4AF37] italic">"yes!"</span></h2>
-      </div>
-      
-      <div className="relative w-full max-w-7xl h-[650px] md:h-[500px] flex flex-col md:flex-row items-center justify-center px-4 shrink-0 gap-8 md:gap-8 overflow-hidden md:overflow-visible">
-        
-        {/* Left: Press Images */}
-        <div className="w-full md:w-1/2 relative h-[280px] md:h-full flex items-center justify-center">
-          <h3 className="absolute top-0 md:-top-10 font-sans text-[10px] md:text-xs tracking-[0.2em] text-black/40 uppercase z-0">The Press</h3>
-          {pressItems.map((item, i) => (
-            <div 
-              key={`press-${i}`}
-              ref={el => { pressCardsRef.current[i] = el; }}
-              className="absolute w-[85%] md:w-[90%] max-w-md bg-white shadow-[0_20px_40px_rgba(0,0,0,0.15)] overflow-hidden rounded-xl border border-gray-100 flex items-center justify-center p-2 h-[220px] md:h-[450px]"
-              style={{ zIndex: i }}
-            >
-              <img src={item.img} alt={`Press Publication ${i + 1}`} className="w-full h-full object-contain block" />
-            </div>
-          ))}
+      <div className="max-w-7xl mx-auto w-full px-6 relative z-10">
+        <div className="text-center mb-16 md:mb-24">
+          <motion.h2 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="font-serif text-4xl md:text-6xl text-gray-900 tracking-tight"
+          >
+            Your Vision, <span className="italic text-[#D4AF37]">Our</span> Integrity
+          </motion.h2>
+          <motion.div 
+            initial={{ scaleX: 0 }}
+            whileInView={{ scaleX: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.3, duration: 0.8 }}
+            className="h-[1px] w-24 bg-[#D4AF37] mx-auto mt-6"
+          ></motion.div>
         </div>
 
-        {/* Right: Video Testimonials */}
-        <div className="w-full md:w-1/2 relative h-[280px] md:h-full flex items-center justify-center mt-4 md:mt-0">
-          <h3 className="absolute -top-4 md:-top-10 font-sans text-[10px] md:text-xs tracking-[0.2em] text-black/40 uppercase z-0">The Voices</h3>
-          {videoItems.map((item, i) => {
-            const isTopmost = activeIndex === i;
-            const isMuted = !isTopmost || !userUnmuted[i];
-
-            return (
-              <div 
-                key={`video-${i}`}
-                ref={el => { videoCardsRef.current[i] = el; }}
-                className="absolute w-[85%] md:w-[90%] max-w-md bg-black shadow-[0_20px_40px_rgba(0,0,0,0.2)] overflow-hidden rounded-xl border border-white/10 flex items-center justify-center h-[240px] md:h-[450px]"
-                style={{ zIndex: i }}
+        <div className="flex flex-col md:flex-row items-center gap-12 lg:gap-24">
+          
+          {/* Left: Media Side */}
+          <div className="w-full md:w-1/2 aspect-[4/5] md:aspect-square relative group">
+            <AnimatePresence mode="wait" custom={direction}>
+              <motion.div
+                key={index}
+                custom={direction}
+                initial={{ opacity: 0, x: direction * 50, scale: 0.95 }}
+                animate={{ opacity: 1, x: 0, scale: 1 }}
+                exit={{ opacity: 0, x: -direction * 50, scale: 0.95 }}
+                transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                className="w-full h-full rounded-2xl overflow-hidden shadow-2xl shadow-black/10 border border-black/5 relative bg-white"
               >
-                <div className="absolute inset-0 w-full h-full opacity-50 grayscale mix-blend-luminosity pointer-events-none overflow-hidden origin-center flex items-center justify-center">
-                  <video 
-                    ref={el => { videoRefs.current[i] = el; }}
-                    src={item.video}
-                    autoPlay
-                    muted={isMuted}
-                    loop
-                    playsInline
+                {current.type === 'video' ? (
+                  <>
+                    <video
+                      ref={videoRef}
+                      src={current.src}
+                      autoPlay
+                      muted={isMuted}
+                      loop
+                      playsInline
+                      className="w-full h-full object-cover"
+                    />
+                    <button 
+                      onClick={() => setIsMuted(!isMuted)}
+                      className="absolute bottom-6 right-6 p-4 rounded-full bg-white/40 backdrop-blur-md border border-black/10 hover:bg-white/60 transition-all z-20 text-black"
+                    >
+                      {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5 text-[#D4AF37]" />}
+                    </button>
+                  </>
+                ) : (
+                  <img 
+                    src={current.src} 
+                    alt={current.author} 
                     className="w-full h-full object-cover"
                   />
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-black/30 pointer-events-none"></div>
-                <div className="relative z-10 p-4 md:p-10 text-center w-full mt-auto flex flex-col items-center">
-                  <button 
-                    onClick={() => toggleMute(i)}
-                    className={`mb-2 md:mb-4 p-2 md:p-3 rounded-full backdrop-blur-md transition-all ${userUnmuted[i] ? 'bg-white/30 text-[#D4AF37]' : 'bg-white/10 text-white hover:bg-white/20'}`}
-                  >
-                    {userUnmuted[i] ? <Volume2 className="w-4 h-4 md:w-5 md:h-5" /> : <VolumeX className="w-4 h-4 md:w-5 md:h-5" />}
-                  </button>
-                  <p className="text-white font-serif text-sm md:text-2xl italic leading-snug drop-shadow-lg line-clamp-3 md:line-clamp-none">"{item.quote}"</p>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+                )}
+                
+                {/* Overlay Gradient */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none"></div>
+              </motion.div>
+            </AnimatePresence>
 
+            {/* Navigation Buttons */}
+            <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4 z-30">
+              <button 
+                onClick={prev}
+                className="w-12 h-12 rounded-full bg-black text-white flex items-center justify-center hover:bg-[#D4AF37] transition-all shadow-xl cursor-pointer"
+              >
+                <ChevronLeft className="w-6 h-6" />
+              </button>
+              <div className="bg-white/80 backdrop-blur-md px-4 py-2 rounded-full border border-black/5 text-[10px] font-mono tracking-widest text-[#D4AF37] shadow-sm">
+                {String(index + 1).padStart(2, '0')} / {String(testimonials.length).padStart(2, '0')}
+              </div>
+              <button 
+                onClick={next}
+                className="w-12 h-12 rounded-full bg-black text-white flex items-center justify-center hover:bg-[#D4AF37] transition-all shadow-xl cursor-pointer"
+              >
+                <ChevronRight className="w-6 h-6" />
+              </button>
+            </div>
+          </div>
+
+          {/* Right: Content Side */}
+          <div className="w-full md:w-1/2 space-y-8 md:space-y-12">
+            <div>
+              <motion.div
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                className="flex items-center gap-4 text-[#D4AF37] mb-6"
+              >
+                <div className="h-[1px] w-12 bg-[#D4AF37]"></div>
+                <span className="uppercase tracking-[0.3em] text-[10px] md:text-xs font-bold font-sans">Voices of the Industry</span>
+              </motion.div>
+              
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <Quote className="w-12 h-12 md:w-16 md:h-16 text-[#D4AF37]/10 mb-6" />
+                  <p className="font-serif text-2xl md:text-3xl lg:text-4xl leading-tight italic text-gray-800">
+                    "{current.quote}"
+                  </p>
+                  
+                  <div className="mt-10 md:mt-12 flex items-center gap-6">
+                    <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-[#D4AF37]/20 p-1">
+                      <img src={current.thumbnail} alt={current.author} className="w-full h-full object-cover rounded-full" />
+                    </div>
+                    <div>
+                      <h4 className="text-xl md:text-2xl font-bold font-serif text-gray-900">{current.author}</h4>
+                      <p className="text-[#D4AF37] text-xs md:text-sm uppercase tracking-widest font-sans mt-1">{current.role}</p>
+                    </div>
+                  </div>
+                </motion.div>
+              </AnimatePresence>
+            </div>
+
+            {/* Pagination Dots */}
+            <div className="flex items-center gap-3">
+              {testimonials.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => {
+                    setDirection(i > index ? 1 : -1);
+                    setIndex(i);
+                  }}
+                  className={`h-1.5 transition-all duration-300 rounded-full cursor-pointer ${
+                    i === index ? 'w-8 bg-[#D4AF37]' : 'w-2 bg-gray-300 hover:bg-gray-400'
+                  }`}
+                />
+              ))}
+            </div>
+          </div>
+
+        </div>
       </div>
-    </div>
+
+      {/* Decorative Text */}
+      <motion.div 
+        animate={{ x: [-100, 100] }}
+        transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+        className="absolute top-20 left-0 text-[15vw] font-serif opacity-[0.02] select-none pointer-events-none italic whitespace-nowrap text-black"
+      >
+        client testimonials • cinema legends • global impact
+      </motion.div>
+    </section>
   );
 }
+

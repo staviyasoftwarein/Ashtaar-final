@@ -1,6 +1,6 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, useScroll, useTransform, useSpring, AnimatePresence } from 'motion/react';
-import { Play, Youtube, BarChart2, Sparkles, ArrowUpRight, Cpu } from 'lucide-react';
+import { Play, Pause, Volume2, VolumeX, Youtube, BarChart2, Sparkles, ArrowUpRight, Cpu } from 'lucide-react';
 
 /* ======================================================================
    REUSABLE UI COMPONENTS
@@ -286,68 +286,200 @@ const Equalizer = () => (
 
 function Slide3_Music() {
   const [activeIdx, setActiveIdx] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+  const [volume, setVolume] = useState(80);
+  const [player, setPlayer] = useState<any>(null);
   const track = ytTracks[activeIdx];
   const thumb = `https://img.youtube.com/vi/${track.id}/maxresdefault.jpg`;
 
+  // Initialize YouTube API
+  useEffect(() => {
+    // Load the API script if it's not already there
+    if (!window.hasOwnProperty('YT')) {
+      const tag = document.createElement('script');
+      tag.src = "https://www.youtube.com/iframe_api";
+      const firstScriptTag = document.getElementsByTagName('script')[0];
+      if (firstScriptTag && firstScriptTag.parentNode) {
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+      }
+    }
+
+    // This function is called by the YT API when it's ready
+    (window as any).onYouTubeIframeAPIReady = () => {
+      createPlayer(ytTracks[activeIdx].id);
+    };
+
+    if ((window as any).YT && (window as any).YT.Player) {
+      createPlayer(ytTracks[activeIdx].id);
+    }
+
+    return () => {
+      if (player) player.destroy();
+    };
+  }, []);
+
+  const createPlayer = (videoId: string) => {
+    if ((window as any).YT && (window as any).YT.Player) {
+      const newPlayer = new (window as any).YT.Player('yt-player-instance', {
+        height: '0',
+        width: '0',
+        videoId: videoId,
+        playerVars: {
+          autoplay: 0,
+          controls: 0,
+          disablekb: 1,
+          fs: 0,
+          rel: 0,
+          modestbranding: 1
+        },
+        events: {
+          onReady: (event: any) => {
+            setPlayer(event.target);
+            event.target.setVolume(volume);
+            if (isMuted) event.target.mute();
+            else event.target.unMute();
+          },
+          onStateChange: (event: any) => {
+            // Re-sync state if user interacts with youtube directly (unlikely here but good for consistency)
+            if (event.data === (window as any).YT.PlayerState.PLAYING) setIsPlaying(true);
+            if (event.data === (window as any).YT.PlayerState.PAUSED) setIsPlaying(false);
+          }
+        }
+      });
+      setPlayer(newPlayer);
+    }
+  };
+
+  // Sync Video ID
+  useEffect(() => {
+    if (player && player.loadVideoById) {
+      player.loadVideoById(track.id);
+      if (isPlaying) player.playVideo();
+      else player.pauseVideo();
+    }
+  }, [activeIdx]);
+
+  // Sync Playback state
+  useEffect(() => {
+    if (player) {
+      if (isPlaying) player.playVideo();
+      else player.pauseVideo();
+    }
+  }, [isPlaying]);
+
+  // Sync Mute state
+  useEffect(() => {
+    if (player) {
+      if (isMuted) player.mute();
+      else player.unMute();
+    }
+  }, [isMuted]);
+
+  // Sync Volume
+  useEffect(() => {
+    if (player && player.setVolume) {
+      player.setVolume(volume);
+    }
+  }, [volume]);
+
   return (
     <div className="w-screen h-[100dvh] shrink-0 flex flex-col md:flex-row bg-[#080808]">
+      {/* Hidden YouTube Player div */}
+      <div id="yt-player-instance" className="hidden"></div>
+
       {/* Left Intro */}
       <div className="relative w-full md:w-[45%] lg:w-[40%] h-1/2 md:h-full flex flex-col justify-center border-b md:border-b-0 md:border-r border-white/5 shrink-0 overflow-hidden bg-[#0a0a0a]">
          <TextContainerAmbient watermark="03" glowColor="bg-[#FF0000]/20" />
          
          <div className="relative z-10 w-full h-full flex flex-col justify-center px-6 py-6 md:p-16 lg:p-24 overflow-y-auto custom-scrollbar">
-           <SectionTitle num="03" text="ASHTAAR MUSIC PRODUCTION" />
+           <SectionTitle num="03" text="Music Production" />
+           <SectionSubhead text="Custom Scores" />
            
-           <div className="flex flex-col items-center gap-4 mb-6 mt-4 shrink-0 w-full max-w-sm md:max-w-md mx-auto md:mx-0">
+           <div className="flex flex-col items-start gap-4 md:gap-6 mb-6 mt-4 shrink-0 w-full max-w-sm md:max-w-md">
               <motion.div 
-                className="w-48 h-48 md:w-64 md:h-64 rounded-full shadow-[0_20px_50px_rgba(0,0,0,0.8)] border-[4px] md:border-[6px] border-[#050505] overflow-hidden shrink-0 relative"
-                animate={{ rotate: 360 }} transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+                className="w-32 h-32 sm:w-40 sm:h-40 md:w-64 md:h-64 rounded-full shadow-[0_20px_50px_rgba(0,0,0,0.8)] border-[4px] md:border-[6px] border-[#050505] overflow-hidden shrink-0 relative"
+                animate={{ rotate: isPlaying ? 360 : 0 }} 
+                transition={{ duration: 15, repeat: isPlaying ? Infinity : 0, ease: "linear" }}
               >
                  <img src={thumb} className="w-full h-full object-cover scale-125" />
                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 md:w-12 md:h-12 bg-[#080808] rounded-full border border-white/20 z-10 flex items-center justify-center">
-                    <div className="w-2 h-2 bg-black rounded-full"></div>
+                    <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-black rounded-full"></div>
                  </div>
               </motion.div>
-              <div className="min-w-0 text-center w-full mt-2">
-                <h4 className="text-white font-bold text-xl md:text-2xl mb-1 md:mb-2 truncate">{track.title}</h4>
+              <div className="min-w-0 text-left w-full">
+                <h4 className="text-white font-bold text-xl md:text-2xl mb-1 truncate">{track.title}</h4>
                 <p className="text-[#FF0000] font-mono text-[10px] md:text-xs uppercase tracking-widest truncate">{track.artist}</p>
               </div>
            </div>
 
-           <motion.div initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="shrink-0 flex justify-center w-full max-w-sm md:max-w-md mx-auto md:mx-0">
-             <a 
-               href={`https://youtu.be/${track.id}`} target="_blank" rel="noreferrer"
-               className="flex items-center justify-center gap-2 md:gap-3 w-full max-w-xs bg-white text-black py-3 md:py-4 rounded-full hover:bg-[#FF0000] hover:text-white transition-colors font-bold text-xs md:text-sm tracking-wide shadow-xl group"
-             >
-               <Youtube className="w-4 h-4 md:w-5 md:h-5" /> Play Full Track
-             </a>
-           </motion.div>
+           <div className="flex flex-col gap-4 shrink-0 items-start w-full max-w-sm">
+              <div className="flex items-center justify-start gap-3 w-full">
+                <motion.button 
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => {
+                    setIsPlaying(true);
+                    window.open('https://www.youtube.com/@AshtaarFilms/playlists', '_blank');
+                  }}
+                  className="flex items-center justify-center gap-2 bg-[#FF0000] text-white py-3 px-6 md:py-4 md:px-8 rounded-full transition-all font-bold text-xs md:text-sm tracking-wide shadow-xl group border-none outline-none cursor-pointer"
+                >
+                  <Play className="w-4 h-4 fill-current" />
+                  Play Full Playlist
+                </motion.button>
+                
+                <button 
+                  onClick={() => setIsMuted(!isMuted)}
+                  className="w-10 h-10 md:w-14 md:h-14 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/5 transition-colors bg-transparent cursor-pointer shrink-0"
+                >
+                  {isMuted ? <VolumeX className="w-5 h-5 text-white/60" /> : <Volume2 className="w-5 h-5 text-[#FF0000]" />}
+                </button>
+              </div>
+
+              {/* Volume Slider */}
+              <div className="flex items-center gap-3 w-full px-2">
+                <VolumeX className="w-4 h-4 text-white/20" />
+                <input 
+                  type="range" min="0" max="100" value={volume} 
+                  onChange={(e) => setVolume(parseInt(e.target.value))}
+                  className="flex-1 h-1 bg-white/10 rounded-full appearance-none cursor-pointer accent-[#FF0000]"
+                />
+                <Volume2 className="w-4 h-4 text-white/20" />
+              </div>
+              
+              <div className="flex items-center gap-4 text-[9px] md:text-[10px] font-mono text-white/30 tracking-widest uppercase mt-2">
+                <div className="flex items-center gap-1.5"><div className={`w-1.5 h-1.5 rounded-full bg-[#FF0000] ${isPlaying ? 'animate-pulse' : ''}`}></div> {isPlaying ? 'Streaming' : 'Ready'}</div>
+                <div className="w-[1px] h-3 bg-white/10"></div>
+                <div className="flex items-center gap-1.5 hover:text-white transition-colors cursor-pointer" onClick={() => window.open(`https://youtu.be/${track.id}`, '_blank')}>
+                   <Youtube className="w-3.5 h-3.5" /> YouTube
+                </div>
+              </div>
+           </div>
          </div>
       </div>
 
       {/* Right Media (Playlist) */}
-      <div className="w-full md:w-[55%] lg:w-[60%] h-1/2 md:h-full flex flex-col p-4 md:p-12 lg:p-24 z-10 bg-[#000000]/60 backdrop-blur-md overflow-hidden">
+      <div className="w-full md:w-[55%] lg:w-[60%] h-1/2 md:h-full flex flex-col p-6 md:p-12 lg:p-24 z-10 bg-[#000000]/60 backdrop-blur-md overflow-hidden">
          <motion.div 
            initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-           className="flex justify-between items-center mb-4 md:mb-10 shrink-0"
+           className="flex justify-between items-center mb-3 md:mb-10 shrink-0"
          >
            <div className="flex items-center gap-3">
-             <div className="w-1 h-6 bg-[#FF0000]"></div>
-             <div className="text-white/40 text-[10px] md:text-xs font-bold tracking-[0.2em] uppercase">Queue • {ytTracks.length} Tracks</div>
+             <div className="w-1 h-4 md:h-6 bg-[#FF0000]"></div>
+             <div className="text-white/40 text-[9px] md:text-xs font-bold tracking-[0.2em] uppercase">Queue • {ytTracks.length} Tracks</div>
            </div>
-           <BarChart2 className="w-6 h-6 md:w-8 md:h-8 text-white/20 hidden md:block" />
+           <BarChart2 className="w-5 h-5 md:w-8 md:h-8 text-white/20" />
          </motion.div>
 
 
-         <motion.div 
-           initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}
-           className="flex-1 flex flex-col gap-2 overflow-y-auto custom-scrollbar pr-2 md:pr-4 min-h-[0px]"
-         >
-           {ytTracks.map((t, i) => (
-             <div 
-               key={t.id} onClick={() => { setActiveIdx(i); window.open(`https://youtu.be/${t.id}`, '_blank'); }}
-               className={`flex items-center gap-3 md:gap-5 p-3 md:p-4 rounded-xl cursor-pointer transition-all duration-300 group hover:bg-white/5`}
-             >
+          <motion.div 
+            initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}
+            className="flex-1 flex flex-col gap-1 md:gap-2 overflow-y-auto custom-scrollbar pr-1 md:pr-4 min-h-[0px]"
+          >
+            {ytTracks.map((t, i) => (
+              <div 
+                key={t.id} onClick={() => { setActiveIdx(i); setIsPlaying(true); }}
+                className={`flex items-center gap-3 md:gap-5 p-2 md:p-4 rounded-xl cursor-pointer transition-all duration-300 group hover:bg-white/5 ${activeIdx === i ? 'bg-white/5 shadow-lg' : ''}`}
+              >
                 <div className="w-12 h-12 md:w-16 md:h-16 rounded-lg md:rounded-xl overflow-hidden relative shrink-0">
                    <img src={`https://img.youtube.com/vi/${t.id}/hqdefault.jpg`} className="w-full h-full object-cover opacity-80" />
                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
@@ -439,16 +571,7 @@ function Slide4_AI() {
                    </div>
                 </div>
 
-                {/* Video Player UI Scaffolding */}
-                <div className="absolute bottom-0 left-0 w-full p-3 md:p-6 bg-gradient-to-t from-black to-transparent opacity-0 group-hover/player:opacity-100 transition-opacity duration-500 flex items-end justify-between pointer-events-none">
-                   <div className="flex items-center gap-2 md:gap-3">
-                      <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-[#D4AF37] animate-pulse"></div>
-                      <span className="font-mono text-[8px] md:text-[10px] text-white/70 uppercase tracking-widest">Sys_Render_Live</span>
-                   </div>
-                   <div className="w-1/2 h-0.5 md:h-1 bg-white/20 rounded-full overflow-hidden">
-                      <div className="w-1/3 h-full bg-white"></div>
-                   </div>
-                </div>
+                {/* Video Player UI Scaffolding removed as requested */}
               </>
             )}
          </motion.div>

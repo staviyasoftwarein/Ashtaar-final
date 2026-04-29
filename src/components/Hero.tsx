@@ -1,4 +1,5 @@
 import { useRef, useEffect } from 'react';
+import { motion } from 'motion/react';
 import gsap from 'gsap';
 import ScrollTrigger from 'gsap/ScrollTrigger';
 
@@ -26,21 +27,30 @@ export default function Hero() {
     
     const ctx = gsap.context(() => {
       // Use fromTo to strictly enforce the scale values and prevent state corruption
-      gsap.fromTo(textRef.current, 
-        { scale: 1 },
-        {
-          scale: 300,
-          force3D: false, // CRITICAL: Prevents the browser from crashing due to massive GPU texture limits
-          ease: "none",
-          scrollTrigger: {
-            trigger: containerRef.current,
-            scrub: 1,
-            pin: true,
-            start: "top top",
-            end: "+=1500" // Slightly longer scroll for smoother zoom
-          },
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: containerRef.current,
+          scrub: 1,
+          pin: true,
+          start: "top top",
+          end: "+=1500" // Slightly longer scroll for smoother zoom
         }
-      );
+      });
+      
+      tl.to(textRef.current, {
+        scale: 300,
+        force3D: false, // CRITICAL: Prevents the browser from crashing due to massive GPU texture limits
+        ease: "none",
+      }, 0);
+
+      const scrollIndicator = containerRef.current?.querySelector('.scroll-indicator');
+      if (scrollIndicator) {
+        tl.to(scrollIndicator, {
+          opacity: 0,
+          ease: "none",
+          duration: 0.1 // Fade out quickly at the start of scroll
+        }, 0);
+      }
     }, containerRef);
 
     return () => ctx.revert();
@@ -62,16 +72,25 @@ export default function Hero() {
       </video>
       
       {/* Removed overflow-hidden from here to fix the Safari/WebKit clipping bug */}
-      <div className="absolute inset-0 w-full h-full bg-white flex flex-col justify-center items-center mix-blend-screen">
+      <div className="absolute inset-0 w-full h-full bg-white flex flex-col justify-center items-center mix-blend-screen z-10">
         <h2 
           ref={textRef}
           className="text-[18vw] sm:text-[80px] md:text-[120px] font-hero text-black m-0 p-0 origin-center whitespace-nowrap"
         >
           ASHTAAR
         </h2>
-        <div className="absolute bottom-12 flex flex-col items-center gap-2 opacity-60">
-          <span className="text-black text-xs tracking-[0.3em] uppercase font-sans">Scroll to explore</span>
-          <div className="w-[1px] h-12 bg-black animate-pulse"></div>
+      </div>
+
+      <div className="scroll-indicator absolute bottom-8 md:bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-4 z-20 pointer-events-none">
+        <span className="text-black text-[11px] md:text-sm tracking-[0.2em] font-serif uppercase font-semibold text-center">
+          Scroll to explore
+        </span>
+        <div className="w-[22px] h-[36px] md:w-[26px] md:h-[42px] border-[1.5px] border-black rounded-full flex justify-center items-start pt-[6px]">
+          <motion.div 
+            animate={{ y: [0, 10, 0], opacity: [1, 0, 1] }}
+            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+            className="w-[3px] h-[6px] md:w-1 md:h-[8px] bg-black rounded-full"
+          />
         </div>
       </div>
     </div>

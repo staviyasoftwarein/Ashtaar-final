@@ -1,4 +1,4 @@
-import { motion } from 'motion/react';
+import { motion, useSpring, useMotionValue } from 'motion/react';
 import { Instagram, Twitter, Linkedin, Youtube, ArrowRight } from 'lucide-react';
 
 const socialLinks = [
@@ -9,6 +9,31 @@ const socialLinks = [
 ];
 
 export default function Footer() {
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  
+  const springConfig = { damping: 15, stiffness: 150, mass: 0.5 };
+  const smoothX = useSpring(x, springConfig);
+  const smoothY = useSpring(y, springConfig);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLHeadingElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    
+    const distanceX = e.clientX - centerX;
+    const distanceY = e.clientY - centerY;
+    
+    x.set(distanceX * 0.15); 
+    y.set(distanceY * 0.2);
+  };
+
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
+
   return (
     <footer className="bg-[#0a0a0a] text-white pt-32 pb-12 px-6 md:px-12 relative z-20 overflow-hidden">
       <div className="max-w-7xl mx-auto relative z-10">
@@ -35,11 +60,16 @@ export default function Footer() {
                     const Icon = social.icon;
                     return (
                       <li key={social.name}>
-                        <a href={social.href} className="group flex items-center gap-4 font-serif text-xl md:text-2xl text-gray-300 hover:text-[#D4AF37] hover:italic transition-all duration-300 w-fit">
+                        <a 
+                          href={social.href} 
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="group flex items-center gap-4 font-serif text-xl md:text-2xl text-gray-300 hover:text-[#D4AF37] hover:scale-105 origin-left transition-all duration-300 w-fit"
+                        >
                           <Icon className="w-5 h-5 md:w-6 md:h-6 text-white group-hover:text-[#D4AF37] group-hover:scale-110 transition-all duration-300" strokeWidth={1.5} />
                           <span className="relative overflow-hidden h-[1.2em] inline-block leading-tight">
-                            <span className="block transition-transform duration-300 group-hover:-translate-y-[110%]">{social.name}</span>
-                            <span className="absolute top-0 left-0 block translate-y-[110%] transition-transform duration-300 group-hover:translate-y-0 italic">{social.name}</span>
+                            <span className="block transition-transform duration-300 group-hover:-translate-y-[110%] group-hover:opacity-0">{social.name}</span>
+                            <span className="absolute top-0 left-0 block translate-y-[110%] transition-transform duration-300 group-hover:translate-y-0 italic group-hover:opacity-100">{social.name}</span>
                           </span>
                         </a>
                       </li>
@@ -49,10 +79,10 @@ export default function Footer() {
               </div>
               <div>
                 <h4 className="text-gray-500 uppercase tracking-[0.2em] text-xs font-bold mb-6 font-sans">Location</h4>
-                <address className="group not-italic font-serif text-xl md:text-2xl text-gray-300 space-y-2 cursor-default">
-                  <p className="hover:text-white hover:translate-x-2 transition-transform duration-300">Surat,</p>
-                  <p className="hover:text-white hover:translate-x-2 transition-transform duration-300 delay-75">Gujarat,</p>
-                  <p className="hover:text-white hover:translate-x-2 transition-transform duration-300 delay-150">India</p>
+                <address className="not-italic font-serif text-xl md:text-2xl text-gray-300 space-y-2 cursor-default flex flex-col items-start">
+                  <p className="hover:text-[#D4AF37] hover:translate-x-3 transition-all duration-300 ease-out origin-left cursor-pointer w-fit italic hover:scale-105">Surat,</p>
+                  <p className="hover:text-[#D4AF37] hover:translate-x-3 transition-all duration-300 ease-out origin-left cursor-pointer w-fit italic hover:scale-105">Gujarat,</p>
+                  <p className="hover:text-[#D4AF37] hover:translate-x-3 transition-all duration-300 ease-out origin-left cursor-pointer w-fit italic hover:scale-105">India</p>
                 </address>
               </div>
             </div>
@@ -67,11 +97,18 @@ export default function Footer() {
 
       </div>
 
-      {/* Massive Awwwards-style typography reveal */}
-      <div className="absolute bottom-0 left-0 w-full flex justify-center overflow-hidden pointer-events-none select-none opacity-5">
-        <h1 className="text-[25vw] font-serif leading-[0.75] text-white whitespace-nowrap">
+      <div className="absolute bottom-0 left-0 w-full flex justify-center overflow-hidden select-none" style={{ perspective: "1000px" }}>
+        <motion.h1 
+          onMouseMove={handleMouseMove}
+          onMouseLeave={handleMouseLeave}
+          style={{ 
+            x: smoothX, 
+            y: smoothY,
+          }}
+          className="text-[25vw] font-serif leading-[0.75] text-white/5 whitespace-nowrap cursor-crosshair transition-all duration-700 ease-out"
+        >
           ASHTAAR
-        </h1>
+        </motion.h1>
       </div>
     </footer>
   );

@@ -25,10 +25,14 @@ export default function Careers() {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [showRoles, setShowRoles] = useState(false);
+  const [formData, setFormData] = useState({ name: '', email: '', phone: '', url: '', letter: '' });
+  const [isSubmittng, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<null | 'success' | 'error'>(null);
 
   useEffect(() => {
     if (selectedIndex !== null) {
       document.body.style.overflow = 'hidden';
+      setSubmitStatus(null);
     } else {
       document.body.style.overflow = 'auto';
     }
@@ -36,6 +40,27 @@ export default function Careers() {
   }, [selectedIndex]);
 
   const selectedData = selectedIndex !== null ? rolesData[selectedIndex] : null;
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.name || !formData.email || !formData.phone) {
+      setSubmitStatus('error');
+      return;
+    }
+    // Validate basic email format
+    if (!/^\S+@\S+\.\S+$/.test(formData.email)) {
+      setSubmitStatus('error');
+      return;
+    }
+    setIsSubmitting(true);
+    
+    // Simulate network request
+    setTimeout(() => {
+      setIsSubmitting(false);
+      setSubmitStatus('success');
+      setFormData({ name: '', email: '', phone: '', url: '', letter: '' });
+    }, 1000);
+  };
 
   return (
     <section id="careers" className="relative w-full bg-transparent selection:bg-white/20 min-h-[100dvh]">
@@ -62,7 +87,12 @@ export default function Careers() {
               transition={{ duration: 0.6 }}
               className="absolute inset-0 w-full h-full"
             >
-               <img src="/bts7.jpeg" className="w-full h-full object-cover opacity-20 grayscale blur-[1px]" />
+               <img 
+                 src="/bts7.jpeg" 
+                 loading="lazy"
+                 decoding="async"
+                 className="w-full h-full object-cover opacity-20 grayscale blur-[1px]" 
+               />
             </motion.div>
           )}
         </AnimatePresence>
@@ -195,6 +225,8 @@ export default function Careers() {
                 animate={{ scale: 1.15 }}
                 transition={{ duration: 30, ease: "linear" }}
                 src={selectedData.img} 
+                loading="lazy"
+                decoding="async"
                 className="absolute inset-0 w-full h-full object-cover opacity-70" 
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent z-[5]"></div>
@@ -214,50 +246,64 @@ export default function Careers() {
 
             {/* Application Form */}
             <div className="w-full relative z-10 p-6 sm:p-8 md:p-12 lg:p-20 pb-24 flex flex-col flex-1 shrink-0">
-              
+                      
               <div className="max-w-3xl w-full mx-auto relative z-10">
-                <h3 className="text-2xl md:text-4xl font-bold mb-2 text-white">Application Request</h3>
-                <p className="text-white/40 text-xs md:text-sm mb-10 md:mb-16 font-light">
-                  Submit your details securely to our talent acquisition team. We review portfolios on a rolling basis.
-                </p>
-                
-                <form className="space-y-8 md:space-y-12">
-                  {/* Inputs */}
-                  <div className="relative group">
-                    <label className="block text-[10px] uppercase tracking-[0.1em] text-white/40 mb-2 font-mono pb-1">Full Legal Name</label>
-                    <input type="text" className="w-full bg-transparent border-b border-white/20 py-2 md:py-3 text-white text-base md:text-lg focus:outline-none focus:border-white transition-colors" placeholder="Christopher Nolan" />
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
-                    <div className="relative group">
-                      <label className="block text-[10px] uppercase tracking-[0.1em] text-white/40 mb-2 font-mono pb-1">Contact Email</label>
-                      <input type="email" className="w-full bg-transparent border-b border-white/20 py-2 md:py-3 text-white text-base md:text-lg focus:outline-none focus:border-white transition-colors" placeholder="director@example.com" />
-                    </div>
-                    <div className="relative group">
-                      <label className="block text-[10px] uppercase tracking-[0.1em] text-white/40 mb-2 font-mono pb-1">Phone Required</label>
-                      <input type="tel" className="w-full bg-transparent border-b border-white/20 py-2 md:py-3 text-white text-base md:text-lg focus:outline-none focus:border-white transition-colors" placeholder="+1 (555) 000-0000" />
-                    </div>
-                  </div>
+                        <h3 className="text-2xl md:text-4xl font-bold mb-2 text-white">Application Request</h3>
+                        <p className="text-white/40 text-xs md:text-sm mb-10 md:mb-16 font-light">
+                          Submit your details securely to our talent acquisition team. We review portfolios on a rolling basis.
+                        </p>
+                        
+                        <form onSubmit={handleSubmit} className="space-y-8 md:space-y-12">
+                          {/* CSRF Token (Mock) */}
+                          <input type="hidden" name="csrf_token" value="mock-csrf-token-abc123" />
 
-                  <div className="relative group">
-                    <label className="block text-[10px] uppercase tracking-[0.1em] text-white/40 mb-2 font-mono pb-1">Primary Portfolio / Reel URL</label>
-                    <input type="url" className="w-full bg-transparent border-b border-white/20 py-2 md:py-3 text-white text-base md:text-lg focus:outline-none focus:border-white transition-colors" placeholder="https://vimeo.com/your-reel" />
-                  </div>
-                  
-                  <div className="relative group">
-                    <label className="block text-[10px] uppercase tracking-[0.1em] text-white/40 mb-2 font-mono pb-1">Brief Cover Letter / Vibe Check</label>
-                    <textarea rows={4} className="w-full bg-transparent border-b border-white/20 py-2 md:py-3 text-white text-base md:text-lg focus:outline-none focus:border-white transition-colors resize-none" placeholder="Tell us why your vision belongs here..."></textarea>
-                  </div>
-                  
-                  <div className="pt-8">
-                    <button type="button" className="w-full bg-white text-black px-6 md:px-8 py-5 md:py-6 uppercase tracking-widest text-[10px] md:text-xs font-bold hover:bg-gray-200 transition-all duration-300 rounded-sm flex items-center justify-center gap-3 group cursor-pointer">
-                      Submit Secure Application
-                      <ArrowUpRight className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-                    </button>
-                    <p className="text-center text-white/20 text-[10px] mt-6 font-mono tracking-widest">ENCRYPTED & CONFIDENTIAL SUBMISSION</p>
-                  </div>
-                </form>
-              </div>
+                          {submitStatus === 'success' && (
+                            <div className="bg-green-500/20 border border-green-500/50 text-green-300 px-4 py-3 rounded text-sm mb-6 font-mono">
+                              Application successfully encrypted and submitted.
+                            </div>
+                          )}
+                          {submitStatus === 'error' && (
+                            <div className="bg-red-500/20 border border-red-500/50 text-red-300 px-4 py-3 rounded text-sm mb-6 font-mono">
+                              Please review the fields. Ensure a valid email and required information are provided.
+                            </div>
+                          )}
+
+                          {/* Inputs */}
+                          <div className="relative group">
+                            <label className="block text-[10px] uppercase tracking-[0.1em] text-white/40 mb-2 font-mono pb-1">Full Legal Name *</label>
+                            <input required type="text" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value.replace(/</g, "")})} className="w-full bg-transparent border-b border-white/20 py-2 md:py-3 text-white text-base md:text-lg focus:outline-none focus:border-white transition-colors" placeholder="Christopher Nolan" />
+                          </div>
+                          
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
+                            <div className="relative group">
+                              <label className="block text-[10px] uppercase tracking-[0.1em] text-white/40 mb-2 font-mono pb-1">Contact Email *</label>
+                              <input required type="email" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value.replace(/</g, "")})} className="w-full bg-transparent border-b border-white/20 py-2 md:py-3 text-white text-base md:text-lg focus:outline-none focus:border-white transition-colors" placeholder="director@example.com" />
+                            </div>
+                            <div className="relative group">
+                              <label className="block text-[10px] uppercase tracking-[0.1em] text-white/40 mb-2 font-mono pb-1">Phone Required *</label>
+                              <input required type="tel" value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value.replace(/</g, "")})} className="w-full bg-transparent border-b border-white/20 py-2 md:py-3 text-white text-base md:text-lg focus:outline-none focus:border-white transition-colors" placeholder="+1 (555) 000-0000" />
+                            </div>
+                          </div>
+
+                          <div className="relative group">
+                            <label className="block text-[10px] uppercase tracking-[0.1em] text-white/40 mb-2 font-mono pb-1">Primary Portfolio / Reel URL</label>
+                            <input type="url" value={formData.url} onChange={(e) => setFormData({...formData, url: e.target.value.replace(/</g, "")})} className="w-full bg-transparent border-b border-white/20 py-2 md:py-3 text-white text-base md:text-lg focus:outline-none focus:border-white transition-colors" placeholder="https://vimeo.com/your-reel" />
+                          </div>
+                          
+                          <div className="relative group">
+                            <label className="block text-[10px] uppercase tracking-[0.1em] text-white/40 mb-2 font-mono pb-1">Brief Cover Letter / Vibe Check</label>
+                            <textarea rows={4} value={formData.letter} onChange={(e) => setFormData({...formData, letter: e.target.value.replace(/</g, "")})} className="w-full bg-transparent border-b border-white/20 py-2 md:py-3 text-white text-base md:text-lg focus:outline-none focus:border-white transition-colors resize-none" placeholder="Tell us why your vision belongs here..."></textarea>
+                          </div>
+                          
+                          <div className="pt-8">
+                            <button type="submit" disabled={isSubmittng} className={`w-full bg-white text-black px-6 md:px-8 py-5 md:py-6 uppercase tracking-widest text-[10px] md:text-xs font-bold hover:bg-gray-200 transition-all duration-300 rounded-sm flex items-center justify-center gap-3 group ${isSubmittng ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer'}`}>
+                              {isSubmittng ? 'Submitting...' : 'Submit Secure Application'}
+                              {!isSubmittng && <ArrowUpRight className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />}
+                            </button>
+                            <p className="text-center text-white/20 text-[10px] mt-6 font-mono tracking-widest">ENCRYPTED & CONFIDENTIAL SUBMISSION</p>
+                          </div>
+                        </form>
+                      </div>
             </div>
           </motion.div>
         )}
