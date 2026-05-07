@@ -28,6 +28,7 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [inHero, setInHero] = useState(true);
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const navigate = useNavigate();
@@ -37,6 +38,10 @@ export default function Navbar() {
     setIsLoaded(true);
 
     const handleScroll = () => {
+      // Logo only shows while the Hero section is on screen.
+      // Hero is h-screen, so once we've scrolled ~70% past the viewport the user has clearly left it.
+      setInHero(window.scrollY < window.innerHeight * 0.7);
+
       if (window.scrollY > 50) {
         setIsVisible(false);
       }
@@ -50,8 +55,9 @@ export default function Navbar() {
       }, 1500);
     };
 
+    handleScroll();
     window.addEventListener('scroll', handleScroll, { passive: true });
-    
+
     return () => {
       window.removeEventListener('scroll', handleScroll);
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
@@ -94,16 +100,20 @@ export default function Navbar() {
         transition={{ duration: 0.6, ease: [0.33, 1, 0.68, 1] }}
         className="fixed top-0 left-0 w-full z-50 px-6 py-6 md:px-12 flex justify-between items-center text-white pointer-events-none drop-shadow-xl"
       >
-        <div 
+        <motion.div
           onClick={() => {
             if (location.pathname !== '/') navigate('/');
             else window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
-          className="flex items-center gap-3 font-serif text-base sm:text-xl md:text-2xl tracking-wider hover:brightness-125 transition-all cursor-pointer pointer-events-auto group"
+          animate={{ opacity: inHero ? 1 : 0 }}
+          transition={{ duration: 0.4, ease: [0.33, 1, 0.68, 1] }}
+          style={{ pointerEvents: inHero ? 'auto' : 'none' }}
+          aria-hidden={!inHero}
+          className="flex items-center gap-3 font-serif text-base sm:text-xl md:text-2xl tracking-wider hover:brightness-125 transition-[filter] cursor-pointer group"
         >
           <AshtaarLogo className="h-8 md:h-10 w-auto group-hover:drop-shadow-[0_0_10px_rgba(212,175,55,0.5)] transition-all opacity-80 md:opacity-100" />
           <span className="drop-shadow-md text-[#D4AF37] opacity-90 md:opacity-100">ASHTAAR FILMS</span>
-        </div>
+        </motion.div>
 
         <button 
           onClick={() => setIsOpen(true)}
@@ -127,7 +137,7 @@ export default function Navbar() {
           >
             {/* Ambient Background */}
             <div className="absolute inset-0 pointer-events-none opacity-20">
-               <div className="absolute inset-0 bg-[url('/bts3.jpeg')] bg-cover bg-center mix-blend-screen grayscale"></div>
+               <div className="absolute inset-0 bg-[url('/bts3.jpg')] bg-cover bg-center mix-blend-screen grayscale"></div>
                <div className="absolute inset-0 bg-gradient-to-b from-black via-black/80 to-[#050505]"></div>
                <div className="absolute top-1/4 right-1/4 w-[40vw] h-[40vh] bg-[#D4AF37]/10 blur-[120px] rounded-full"></div>
             </div>

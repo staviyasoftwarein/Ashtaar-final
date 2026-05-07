@@ -82,7 +82,7 @@ export default function Investment() {
       setSubmitStatus('error');
       return;
     }
-    
+
     setIsSubmitting(true);
     // Simulate API submission
     setTimeout(() => {
@@ -225,7 +225,7 @@ export default function Investment() {
               
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <input type="hidden" name="csrf_token" value="mock-csrf-token-xyz789" />
-                  
+
                   {submitStatus === 'success' && (
                     <div className="bg-green-500/20 border border-green-500/50 text-green-300 px-4 py-3 rounded text-sm mb-6 font-mono">
                       Inquiry successfully securely submitted. We will contact you soon.
