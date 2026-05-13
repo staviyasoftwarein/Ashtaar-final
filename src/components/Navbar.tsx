@@ -13,24 +13,18 @@ const AshtaarLogo = ({ className = "h-8 w-auto" }) => (
   </svg>
 );
 
-const navItems = [
+const navItems: { name: string; id: string; subtitle: string; isRoute?: boolean }[] = [
   { name: 'Our Portfolio', id: 'portfolio', subtitle: 'Our Legacy' },
-  { name: 'The Story', id: 'story', subtitle: 'Our Vision', isRoute: true },
-  { name: 'Testimonials', id: 'testimonials', subtitle: 'Client Words' },
-  { name: 'Behind the Lens', id: 'team', subtitle: 'The Visionaries' },
   { name: 'Behind the Scenes', id: 'bts', subtitle: 'The Process' },
   { name: 'Investment', id: 'investment', subtitle: 'Work With Us' },
   { name: 'Careers', id: 'careers', subtitle: 'Join The Cult' },
-  { name: 'The Journal', id: 'blog', subtitle: 'Cinematic Insights' },
 ];
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
-  const [isVisible, setIsVisible] = useState(true);
+  const [isPastHero, setIsPastHero] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [inHero, setInHero] = useState(true);
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -38,29 +32,19 @@ export default function Navbar() {
     setIsLoaded(true);
 
     const handleScroll = () => {
-      // Logo only shows while the Hero section is on screen.
-      // Hero is h-screen, so once we've scrolled ~70% past the viewport the user has clearly left it.
-      setInHero(window.scrollY < window.innerHeight * 0.7);
-
-      if (window.scrollY > 50) {
-        setIsVisible(false);
+      // Hide logo after scrolling past 80% of viewport height
+      if (window.scrollY > window.innerHeight * 0.8) {
+        setIsPastHero(true);
+      } else {
+        setIsPastHero(false);
       }
-
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-
-      timeoutRef.current = setTimeout(() => {
-        setIsVisible(true);
-      }, 1500);
     };
 
-    handleScroll();
     window.addEventListener('scroll', handleScroll, { passive: true });
-
+    handleScroll(); // initialize on mount
+    
     return () => {
       window.removeEventListener('scroll', handleScroll);
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
   }, []);
 
@@ -95,31 +79,29 @@ export default function Navbar() {
         initial={{ opacity: 0, y: -100 }}
         animate={{ 
           opacity: isLoaded ? 1 : 0, 
-          y: isVisible || isOpen ? 0 : -100 
+          y: 0 
         }}
         transition={{ duration: 0.6, ease: [0.33, 1, 0.68, 1] }}
-        className="fixed top-0 left-0 w-full z-50 px-6 py-6 md:px-12 flex justify-between items-center text-white pointer-events-none drop-shadow-xl"
+        className={`fixed top-0 left-0 w-full z-50 px-6 py-6 md:px-12 flex justify-between items-center text-white drop-shadow-xl transition-all duration-500 pointer-events-none`}
       >
-        <motion.div
+        <div 
           onClick={() => {
             if (location.pathname !== '/') navigate('/');
             else window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
-          animate={{ opacity: inHero ? 1 : 0 }}
-          transition={{ duration: 0.4, ease: [0.33, 1, 0.68, 1] }}
-          style={{ pointerEvents: inHero ? 'auto' : 'none' }}
-          aria-hidden={!inHero}
-          className="flex items-center gap-3 font-serif text-base sm:text-xl md:text-2xl tracking-wider hover:brightness-125 transition-[filter] cursor-pointer group"
+          className={`flex items-center gap-3 font-serif text-base sm:text-xl md:text-2xl tracking-wider hover:brightness-125 transition-all duration-500 cursor-pointer pointer-events-auto group ${
+            isPastHero ? 'opacity-0 -translate-y-4 pointer-events-none' : 'opacity-100 translate-y-0'
+          }`}
         >
           <AshtaarLogo className="h-8 md:h-10 w-auto group-hover:drop-shadow-[0_0_10px_rgba(212,175,55,0.5)] transition-all opacity-80 md:opacity-100" />
           <span className="drop-shadow-md text-[#D4AF37] opacity-90 md:opacity-100">ASHTAAR FILMS</span>
-        </motion.div>
+        </div>
 
         <button 
           onClick={() => setIsOpen(true)}
-          className="pointer-events-auto flex items-center gap-3 text-xs uppercase tracking-[0.2em] text-[#D4AF37] hover:brightness-125 transition-all drop-shadow-md"
+          className="pointer-events-auto flex items-center gap-3 text-xs uppercase tracking-[0.2em] text-[#D4AF37] hover:brightness-125 transition-all drop-shadow-md ml-auto group"
         >
-          <span className="hidden md:inline font-bold">Menu</span>
+          {!isPastHero && <span className="hidden md:inline font-bold animate-in fade-in slide-in-from-right-2 duration-500">Menu</span>}
           <div className="w-10 h-10 rounded-full border border-[#D4AF37]/30 flex items-center justify-center hover:border-[#D4AF37] hover:bg-[#D4AF37]/10 transition-colors backdrop-blur-sm bg-black/20">
             <Menu size={18} />
           </div>
@@ -137,7 +119,7 @@ export default function Navbar() {
           >
             {/* Ambient Background */}
             <div className="absolute inset-0 pointer-events-none opacity-20">
-               <div className="absolute inset-0 bg-[url('/bts3.jpg')] bg-cover bg-center mix-blend-screen grayscale"></div>
+               <div className="absolute inset-0 bg-[url('/bts3.jpeg')] bg-cover bg-center mix-blend-screen grayscale"></div>
                <div className="absolute inset-0 bg-gradient-to-b from-black via-black/80 to-[#050505]"></div>
                <div className="absolute top-1/4 right-1/4 w-[40vw] h-[40vh] bg-[#D4AF37]/10 blur-[120px] rounded-full"></div>
             </div>
@@ -201,7 +183,6 @@ export default function Navbar() {
 
             <div className="relative z-10 px-6 py-8 md:px-12 flex flex-col xl:flex-row justify-between items-center text-[10px] md:text-xs text-white/30 font-mono uppercase tracking-[0.2em] border-t border-white/5 mt-auto gap-8 xl:gap-0">
                <div className="flex flex-col md:flex-row items-center gap-4 md:gap-8 text-center md:text-left">
-                 <p>Surat, Gujarat, India</p>
                  <a href="mailto:contact@ashtaarfilms.com" className="hover:text-[#D4AF37] transition-colors">contact@ashtaarfilms.com</a>
                </div>
                

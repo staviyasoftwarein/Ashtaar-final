@@ -4,10 +4,19 @@ import gsap from 'gsap';
 import ScrollTrigger from 'gsap/ScrollTrigger';
 import { motion, AnimatePresence } from 'motion/react';
 import { X } from 'lucide-react';
-import { useSetting } from '../hooks/useSetting';
-import { DEFAULT_BTS, resolveBtsImageUrl, type BtsConfig } from '../lib/bts';
 
 gsap.registerPlugin(ScrollTrigger);
+
+const images = [
+  '/bts1.jpg',
+  '/bts2.jpg',
+  '/bts3.jpg',
+  '/bts4.jpg',
+  '/bts5.jpg',
+  '/bts6.jpg',
+  '/bts7.jpg',
+  '/bts8.jpg',
+];
 
 const positions = [
   { x: -0.8, y: -0.6},
@@ -45,10 +54,6 @@ export default function BehindTheScenes() {
   const imagesRef = useRef<(HTMLDivElement | null)[]>([]);
   const galleryScrollRef = useRef<HTMLDivElement>(null);
   const [selectedGalleryIndex, setSelectedGalleryIndex] = useState<number | null>(null);
-  const { value: cfg } = useSetting<BtsConfig>('bts', DEFAULT_BTS);
-  const items = cfg.images.length > 0 ? cfg.images : DEFAULT_BTS.images;
-  const images = items.map((it) => resolveBtsImageUrl(it.imagePath)).filter(Boolean);
-  const heroBgUrl = images[0] ?? '';
 
   useEffect(() => {
     if (selectedGalleryIndex !== null && galleryScrollRef.current) {
@@ -65,7 +70,6 @@ export default function BehindTheScenes() {
   }, [selectedGalleryIndex]);
 
   useEffect(() => {
-    if (images.length === 0) return;
     const ctx = gsap.context(() => {
       const flow = containerRef.current;
       const imgs = imagesRef.current.filter(Boolean);
@@ -129,37 +133,24 @@ export default function BehindTheScenes() {
         }, index * 0.08); // Tighter stagger for smoother "tunnel" feel
       });
 
-      // Recompute trigger positions against the live layout. Crucial after the
-      // timeline is rebuilt due to settings changes — without this, ScrollTrigger
-      // can keep stale positions and onUpdate never fires (so _currentZ stays
-      // undefined and the lightbox click guard `z > 400` always fails).
-      ScrollTrigger.refresh();
     }, containerRef);
 
     return () => ctx.revert();
-    // Only re-init when the image *count* changes. Replacing image contents
-    // (admin uploading a new bts3.jpg) doesn't affect the animation — the
-    // <img src> just updates in place.
-  }, [images.length]);
+  }, []);
 
   return (
     <div id="bts" ref={containerRef} className="h-screen bg-black relative overflow-hidden z-20">
       {/* Immersive Background */}
       <div className="absolute inset-0 pointer-events-none z-0">
-        {heroBgUrl && (
-          <div
-            className="absolute inset-0 bg-cover bg-center opacity-20 mix-blend-screen grayscale"
-            style={{ backgroundImage: `url('${heroBgUrl}')` }}
-          />
-        )}
+        <div className="absolute inset-0 bg-[url('/bts1.jpg')] bg-cover bg-center opacity-10"></div>
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_transparent_30%,_#000_100%)]"></div>
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0.8),rgba(0,0,0,0.4),rgba(0,0,0,0.9))]"></div>
+        <div className="absolute inset-0 bg-black/60"></div>
       </div>
 
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 text-center w-full pointer-events-none">
-        <h3 className="text-[#D4AF37] uppercase tracking-[0.3em] text-sm mb-4 font-sans drop-shadow-md">{cfg.eyebrow || DEFAULT_BTS.eyebrow}</h3>
+        <h3 className="text-[#D4AF37] uppercase tracking-[0.3em] text-sm mb-4 font-sans drop-shadow-md">Behind The Scenes</h3>
         <p className="font-serif text-white text-4xl md:text-6xl lg:text-7xl leading-tight opacity-90 drop-shadow-[0_4px_10px_rgba(0,0,0,0.8)]">
-          {cfg.title || DEFAULT_BTS.title}
+          Vision beyond the lens.
         </p>
       </div>
       
@@ -182,7 +173,7 @@ export default function BehindTheScenes() {
               alt="BTS" 
               loading="lazy"
               decoding="async"
-              className="w-full h-full object-cover shadow-[0_0_50px_rgba(0,0,0,0.8)] group-hover:brightness-125 transition-[filter] duration-300"
+              className="w-full h-full object-cover group-hover:brightness-125 transition-[filter] duration-300"
             />
           </div>
         ))}

@@ -1,13 +1,140 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ArrowLeft, ArrowUpRight } from 'lucide-react';
-import { useSetting } from '../hooks/useSetting';
-import { DEFAULT_CAREERS, resolveCareerImageUrl, type CareersConfig } from '../lib/careers';
+
+const ApplicantTypeSelector = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const selectorRef = useRef<HTMLDivElement>(null);
+
+  const options = [
+    {
+      title: "Experienced professional — here for the right pay",
+      subtitle: "Seasoned, skilled, and knows their worth",
+      desc: "You've earned your expertise. You know your value and expect to be paid accordingly."
+    },
+    {
+      title: "Experienced but underrated — driven by passion, not pay",
+      subtitle: "Talented, overlooked, and motivated by craft over compensation",
+      desc: "You have the experience, the skills, and the drive — you just haven't had the stage you deserve yet."
+    },
+    {
+      title: "Skilled professional — ready to prove it",
+      subtitle: "Capable, confident, and looking for the right opportunity",
+      desc: "You're skilled, sharp, and ready to show what you're made of. Give the chance and you'll deliver."
+    },
+    {
+      title: "Fresher or intern — eager to learn and grow",
+      subtitle: "New to the field, ready to absorb and contribute",
+      desc: "You're just getting started — full of energy, curiosity, and the hunger to learn and grow."
+    }
+  ];
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (selectorRef.current && !selectorRef.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  return (
+    <div className="applicant-selector py-2 mb-6 max-w-[560px] w-full" ref={selectorRef}>
+      <style dangerouslySetInnerHTML={{__html: `
+        .applicant-selector {
+          --app-bg-primary: rgba(255,255,255,0.05);
+          --app-bg-secondary: rgba(255,255,255,0.1);
+          --app-border-primary: rgba(255,255,255,0.3);
+          --app-border-secondary: rgba(255,255,255,0.15);
+          --app-border-tertiary: rgba(255,255,255,0.08);
+          --app-text-primary: #ffffff;
+          --app-text-secondary: rgba(255,255,255,0.6);
+          --app-text-tertiary: rgba(255,255,255,0.4);
+        }
+        .applicant-selector .selector-label { font-size: 13px; color: var(--app-text-secondary); margin-bottom: 8px; letter-spacing: 0.04em; }
+        .applicant-selector .custom-select { position: relative; text-transform: none; }
+        .applicant-selector .select-box { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; background: var(--app-bg-primary); border: 0.5px solid var(--app-border-secondary); border-radius: 8px; cursor: pointer; transition: border-color 0.15s; user-select: none; }
+        .applicant-selector .select-box:hover { border-color: var(--app-border-primary); }
+        .applicant-selector .select-box.open { border-color: #B8860B; border-radius: 8px 8px 0 0; }
+        .applicant-selector .select-placeholder { font-size: 15px; color: var(--app-text-tertiary); }
+        .applicant-selector .select-value { font-size: 15px; color: var(--app-text-primary); font-weight: 500; }
+        .applicant-selector .arrow { width: 16px; height: 16px; transition: transform 0.2s; }
+        .applicant-selector .arrow.open { transform: rotate(180deg); }
+        .applicant-selector .dropdown-opts { position: absolute; top: 100%; left: 0; right: 0; background: #080808; border: 0.5px solid #B8860B; border-top: none; border-radius: 0 0 8px 8px; z-index: 50; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .applicant-selector .option { padding: 14px 16px; cursor: pointer; border-top: 0.5px solid var(--app-border-tertiary); transition: background 0.1s; }
+        .applicant-selector .option:hover { background: var(--app-bg-secondary); }
+        .applicant-selector .option.selected { background: var(--app-bg-secondary); }
+        .applicant-selector .option-title { font-size: 14px; font-weight: 500; color: var(--app-text-primary); margin-bottom: 2px; }
+        .applicant-selector .option-desc { font-size: 12px; color: var(--app-text-secondary); }
+        .applicant-selector .gold-dot { width: 8px; height: 8px; border-radius: 50%; background: #B8860B; display: inline-block; margin-right: 8px; flex-shrink: 0; }
+        .applicant-selector .option-row { display: flex; align-items: center; }
+        .applicant-selector .selected-tag { margin-top: 12px; padding: 10px 14px; background: var(--app-bg-primary); border-left: 2px solid #B8860B; border-radius: 0 6px 6px 0; font-size: 13px; color: var(--app-text-secondary); }
+      `}} />
+      <h2 className="sr-only">Career applicant type selector</h2>
+      <p className="selector-label font-mono uppercase">I WOULD DESCRIBE MYSELF AS</p>
+      <div className="custom-select">
+        <div className={`select-box ${isOpen ? 'open' : ''}`} onClick={() => setIsOpen(!isOpen)}>
+          <span className={selectedIndex !== null ? 'select-value' : 'select-placeholder'}>
+            {selectedIndex !== null ? options[selectedIndex].title : 'Select your profile'}
+          </span>
+          <svg className={`arrow ${isOpen ? 'open' : ''}`} viewBox="0 0 16 16" fill="none">
+            <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </div>
+        
+        {isOpen && (
+          <div className="dropdown-opts">
+            {options.map((opt, i) => (
+              <div 
+                key={i} 
+                className={`option ${selectedIndex === i ? 'selected' : ''}`}
+                onClick={() => {
+                  setSelectedIndex(i);
+                  setIsOpen(false);
+                }}
+              >
+                <div className="option-row">
+                  <span className="gold-dot"></span>
+                  <span className="option-title">{opt.title}</span>
+                </div>
+                <div className="option-desc" style={{ paddingLeft: '16px' }}>{opt.subtitle}</div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+      
+      {selectedIndex !== null && (
+        <div className="selected-tag font-light">
+          {options[selectedIndex].desc}
+        </div>
+      )}
+    </div>
+  );
+};
+
+const rolesData = [
+  { title: "Director", dept: "Direction", quote: "Vision is the art of seeing what is invisible to others.", img: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=1920&q=80" },
+  { title: "Assistant Director", dept: "Direction", quote: "Chaos management disguised as scheduling.", img: "https://images.unsplash.com/photo-1485686531765-ba63b07845a7?auto=format&fit=crop&w=1920&q=80" },
+  { title: "Producer", dept: "Production", quote: "Making the impossible happen, on schedule and under budget.", img: "https://images.unsplash.com/photo-1505686994434-e3cc5abf1330?auto=format&fit=crop&w=1920&q=80" },
+  { title: "Cinematographer (DOP)", dept: "Camera", quote: "Painting with light and shadow.", img: "https://images.unsplash.com/photo-1478720568477-152d9b164e26?auto=format&fit=crop&w=1920&q=80" },
+  { title: "Script Writer", dept: "Story", quote: "The blank page is the ultimate canvas.", img: "https://images.unsplash.com/photo-1455390582262-044cdead27d8?auto=format&fit=crop&w=1920&q=80" },
+  { title: "Video Editor", dept: "Post-Production", quote: "Sculpting time and emotion in the cutting room.", img: "https://images.unsplash.com/photo-1574717024653-61fd2cf4ce44?auto=format&fit=crop&w=1920&q=80" },
+  { title: "Sound Designer", dept: "Audio", quote: "Hearing is feeling. We design the heartbeat.", img: "https://images.unsplash.com/photo-1598488035139-27a3c360df91?auto=format&fit=crop&w=1920&q=80" },
+  { title: "Production Manager", dept: "Production", quote: "The architectural backbone of every rolling camera.", img: "https://images.unsplash.com/photo-1498622205843-ea3ce4f52f4c?auto=format&fit=crop&w=1920&q=80" },
+  { title: "Casting Director", dept: "Talent", quote: "Discovering the faces that will define the film.", img: "https://images.unsplash.com/photo-1455894127589-22f75500213a?auto=format&fit=crop&w=1920&q=80" },
+  { title: "VFX Artist", dept: "Post-Production", quote: "Where imagination dictates physical reality.", img: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=1920&q=80" },
+  { title: "Motion Graphics Designer", dept: "Design", quote: "Breathing kinetic energy into static pixels.", img: "https://images.unsplash.com/photo-1558655146-d09347e92766?auto=format&fit=crop&w=1920&q=80" },
+  { title: "Production Assistant", dept: "Production", quote: "The glue handling a thousand invisible miracles.", img: "https://images.unsplash.com/photo-1601506521937-01362e361d7b?auto=format&fit=crop&w=1920&q=80" },
+  { title: "Art Director", dept: "Creative", quote: "Building worlds from the ground up.", img: "https://images.unsplash.com/photo-1498036882173-b41c28af5c1b?auto=format&fit=crop&w=1920&q=80" },
+  { title: "Costume Designer", dept: "Art Dept", quote: "Telling stories through fabric and thread.", img: "https://images.unsplash.com/photo-1520006403909-838d6b92c22e?auto=format&fit=crop&w=1920&q=80" },
+  { title: "Social Media Manager", dept: "Marketing", quote: "Translating cinematic epics into digital pulses.", img: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?auto=format&fit=crop&w=1920&q=80" },
+  { title: "Marketing Executive", dept: "Marketing", quote: "Engineering the global anticipation of modern myth.", img: "https://images.unsplash.com/photo-1553877522-43269d4ea984?auto=format&fit=crop&w=1920&q=80" }
+];
 
 export default function Careers() {
-  const { value: cfg } = useSetting<CareersConfig>('careers', DEFAULT_CAREERS);
-  const rolesData = (cfg.roles ?? DEFAULT_CAREERS.roles).filter((r) => r.active);
-
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [showRoles, setShowRoles] = useState(false);
@@ -24,26 +151,6 @@ export default function Careers() {
     }
     return () => { document.body.style.overflow = 'auto'; }
   }, [selectedIndex]);
-
-  // Warm the browser cache for every active role's hover image so the first
-  // hover doesn't have to wait on a network fetch. Re-runs only when the URL
-  // list actually changes.
-  useEffect(() => {
-    const urls = rolesData
-      .map((r) => resolveCareerImageUrl(r.imagePath))
-      .filter(Boolean);
-    const handles = urls.map((u) => {
-      const img = new Image();
-      img.decoding = 'async';
-      img.src = u;
-      return img;
-    });
-    return () => {
-      // Drop refs so the GC can release if the user leaves the section quickly.
-      handles.forEach((h) => { h.src = ''; });
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rolesData.map((r) => r.imagePath).join('|')]);
 
   const selectedData = selectedIndex !== null ? rolesData[selectedIndex] : null;
 
@@ -73,33 +180,31 @@ export default function Careers() {
       
       {/* FULL SCREEN BACKGROUND IMAGE FOR CAREERS */}
       <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none z-0">
-        <AnimatePresence initial={false}>
-          {hoveredIndex !== null && rolesData[hoveredIndex] ? (
-            <motion.img
+        <AnimatePresence mode="popLayout">
+          {hoveredIndex !== null ? (
+            <motion.img 
               key={hoveredIndex}
               initial={{ opacity: 0, scale: 1 }}
               animate={{ opacity: 0.8, scale: 1.15 }}
               exit={{ opacity: 0 }}
-              transition={{ opacity: { duration: 0.22 }, scale: { duration: 18, ease: 'linear' } }}
-              src={resolveCareerImageUrl(rolesData[hoveredIndex].imagePath)}
-              loading="eager"
-              decoding="async"
+              transition={{ opacity: { duration: 0.6 }, scale: { duration: 25, ease: "linear" } }}
+              src={rolesData[hoveredIndex].img}
               className="absolute inset-0 w-full h-full object-cover"
             />
           ) : (
-            <motion.div
+            <motion.div 
               key="default"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.22 }}
+              transition={{ duration: 0.6 }}
               className="absolute inset-0 w-full h-full"
             >
-               <img
-                 src="/bts7.jpg"
-                 loading="eager"
+               <img 
+                 src="/bts7.jpeg" 
+                 loading="lazy"
                  decoding="async"
-                 className="w-full h-full object-cover opacity-20 grayscale blur-[1px]"
+                 className="w-full h-full object-cover opacity-20 grayscale blur-[1px]" 
                />
             </motion.div>
           )}
@@ -119,22 +224,22 @@ export default function Careers() {
                className="flex items-center gap-3 mb-6 md:mb-8"
             >
                <span className="w-2 h-2 rounded-full bg-[#b20710] animate-pulse shadow-[0_0_10px_#b20710]"></span>
-               <h2 className="text-[10px] md:text-xs text-white/50 font-mono tracking-[0.4em] uppercase font-bold drop-shadow-md">{cfg.eyebrow || DEFAULT_CAREERS.eyebrow}</h2>
+               <h2 className="text-[10px] md:text-xs text-white/50 font-mono tracking-[0.4em] uppercase font-bold drop-shadow-md">Join The Cult</h2>
             </motion.div>
-
-            <motion.h1
+            
+            <motion.h1 
                initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8, delay: 0.1 }}
                className="text-5xl sm:text-6xl md:text-7xl lg:text-[5.5rem] font-black text-white uppercase tracking-tighter leading-[0.9] mb-8 drop-shadow-2xl"
             >
-              {cfg.titleLine1 || DEFAULT_CAREERS.titleLine1}<br />
-              <span className="text-[#D4AF37]">{cfg.titleLine2 || DEFAULT_CAREERS.titleLine2}</span>
+              We don't hire<br />employees.<br />
+              <span className="text-[#D4AF37]">We recruit<br />fanatics.</span>
             </motion.h1>
 
-            <motion.blockquote
+            <motion.blockquote 
                initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ duration: 0.8, delay: 0.2 }}
-               className="text-white/40 text-sm md:text-base font-light leading-relaxed max-w-md border-l border-white/10 pl-4 italic whitespace-pre-line"
+               className="text-white/40 text-sm md:text-base font-light leading-relaxed max-w-md border-l border-white/10 pl-4 italic"
             >
-              "{cfg.description || DEFAULT_CAREERS.description}"
+              "If you're looking for a comfortable 9-to-5, close this tab. We are looking for the obsessed, the detail-oriented, and the relentlessly creative. Leave your ego at the door. Let your work speak. This is not a workplace. It is a forge."
             </motion.blockquote>
           </div>
         </div>
@@ -180,7 +285,7 @@ export default function Careers() {
 
               {rolesData.map((role, i) => (
                 <button
-                  key={role.id || i}
+                  key={i}
                   onMouseEnter={() => setHoveredIndex(i)}
                   onMouseLeave={() => setHoveredIndex(null)}
                   onClick={() => setSelectedIndex(i)}
@@ -228,14 +333,14 @@ export default function Careers() {
 
             {/* Cinematic Hero */}
             <div className="relative w-full min-h-[50vh] md:min-h-[60vh] flex flex-col justify-end p-6 md:p-12 lg:p-20 overflow-hidden bg-black shrink-0 border-b border-white/10 pointer-events-none mt-16 md:mt-0">
-              <motion.img
+              <motion.img 
                 initial={{ scale: 1 }}
                 animate={{ scale: 1.15 }}
                 transition={{ duration: 30, ease: "linear" }}
-                src={resolveCareerImageUrl(selectedData.imagePath)}
+                src={selectedData.img} 
                 loading="lazy"
                 decoding="async"
-                className="absolute inset-0 w-full h-full object-cover opacity-70"
+                className="absolute inset-0 w-full h-full object-cover opacity-70" 
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent z-[5]"></div>
               
@@ -275,6 +380,9 @@ export default function Careers() {
                               Please review the fields. Ensure a valid email and required information are provided.
                             </div>
                           )}
+
+                          {/* Applicant Profile Selector */}
+                          <ApplicantTypeSelector />
 
                           {/* Inputs */}
                           <div className="relative group">

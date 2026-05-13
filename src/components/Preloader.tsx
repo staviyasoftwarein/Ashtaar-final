@@ -1,14 +1,8 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 
-type PreloaderProps = {
-  onComplete: () => void;
-  realProgress: number;   // 0..100 — true byte-level fetch progress
-  assetsLoaded: boolean;  // true when every manifested asset has finished downloading
-};
-
-export default function Preloader({ onComplete, realProgress, assetsLoaded }: PreloaderProps) {
-  const [displayed, setDisplayed] = useState(0);
+export default function Preloader({ onComplete }: { onComplete: () => void }) {
+  const [progress, setProgress] = useState(0);
   const [assembled, setAssembled] = useState(false);
   const [showWordmark, setShowWordmark] = useState(false);
   const [showDivider, setShowDivider] = useState(false);
@@ -23,32 +17,26 @@ export default function Preloader({ onComplete, realProgress, assetsLoaded }: Pr
     return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4); };
   }, []);
 
-  // Smoothly chase the real progress so the bar never jumps; cap at 99 until
-  // assetsLoaded flips true, so we never claim "done" before downloads finish.
+  // Progress bar — starts after logo assembles
   useEffect(() => {
     if (!showProgress) return;
-    const id = setInterval(() => {
-      setDisplayed(d => {
-        const ceiling = assetsLoaded ? 100 : 99;
-        const target = Math.min(ceiling, realProgress);
-        if (d >= target) return d;
-        const step = Math.max(0.4, (target - d) * 0.08);
-        return Math.min(target, d + step);
+    const timer = setInterval(() => {
+      setProgress(p => {
+        if (p >= 100) {
+          clearInterval(timer);
+          setTimeout(onComplete, 800);
+          return 100;
+        }
+        const step =
+          p < 25 ? Math.random() * 0.7 + 0.4
+          : p < 60 ? Math.random() * 1.2 + 0.9
+          : p < 85 ? Math.random() * 1.8 + 1.6
+          : Math.random() * 3 + 2.8;
+        return Math.min(100, p + step);
       });
-    }, 30);
-    return () => clearInterval(id);
-  }, [showProgress, realProgress, assetsLoaded]);
-
-  // Dismiss only when both: bar is visually full AND assets are truly loaded.
-  useEffect(() => {
-    if (!showProgress) return;
-    if (assetsLoaded && displayed >= 100) {
-      const t = setTimeout(onComplete, 600);
-      return () => clearTimeout(t);
-    }
-  }, [assetsLoaded, displayed, showProgress, onComplete]);
-
-  const progress = displayed;
+    }, 20); // Reduced from 65 to 20 to make it ~70% faster
+    return () => clearInterval(timer);
+  }, [showProgress, onComplete]);
 
   const ease = [0.16, 1, 0.3, 1] as const;
 
