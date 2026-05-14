@@ -2,6 +2,9 @@ import { useRef, useEffect } from 'react';
 import { motion } from 'motion/react';
 import gsap from 'gsap';
 import ScrollTrigger from 'gsap/ScrollTrigger';
+import { useAsset } from '../hooks/useAsset';
+import { useSetting } from '../hooks/useSetting';
+import { DEFAULT_HERO_FONT, fontFamilyCss, type HeroFont } from '../lib/fonts';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -9,6 +12,8 @@ export default function Hero() {
   const containerRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLHeadingElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const preloader = useAsset('preloader', '/preloader.mp4');
+  const { value: heroFont } = useSetting<HeroFont>('hero.font', DEFAULT_HERO_FONT);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -59,23 +64,30 @@ export default function Hero() {
   return (
     // Moved overflow-hidden to the parent container to prevent page stretch
     <div id="hero" ref={containerRef} className="relative h-screen w-full overflow-hidden bg-black">
-      <video 
+      <video
+        key={preloader.url ?? 'preloader-empty'}
         ref={videoRef}
-        autoPlay 
-        loop 
-        muted 
+        autoPlay
+        loop
+        muted
         playsInline
-        // Changed to absolute so it stays inside the Hero section and doesn't break other sections
         className="absolute inset-0 w-full h-full object-cover"
       >
-        <source src="/preloader.mp4" type="video/mp4" />
+        {preloader.url && <source src={preloader.url} type="video/mp4" />}
       </video>
       
       {/* Removed overflow-hidden from here to fix the Safari/WebKit clipping bug */}
       <div className="absolute inset-0 w-full h-full bg-white flex flex-col justify-center items-center mix-blend-screen z-10">
-        <h2 
+        <h2
           ref={textRef}
-          className="text-[18vw] sm:text-[80px] md:text-[120px] font-hero text-black m-0 p-0 origin-center whitespace-nowrap"
+          className="text-[18vw] sm:text-[80px] md:text-[120px] text-black m-0 p-0 origin-center whitespace-nowrap"
+          style={{
+            fontFamily: fontFamilyCss(heroFont),
+            fontWeight: heroFont.weight,
+            fontStyle: heroFont.style,
+            letterSpacing: heroFont.letterSpacing,
+            textTransform: heroFont.textTransform ?? 'uppercase',
+          }}
         >
           ASHTAAR
         </h2>

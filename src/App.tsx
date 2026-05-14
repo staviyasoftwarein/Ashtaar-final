@@ -11,6 +11,8 @@ import Lenis from 'lenis';
 import Preloader from './components/Preloader';
 import Navbar from './components/Navbar';
 import AmbientBackground from './components/AmbientBackground';
+import AdminApp from './admin/AdminApp';
+import { usePreloadAssets } from './hooks/usePreloadAssets';
 
 // Eager load fold components
 import Hero from './components/Hero';
@@ -88,8 +90,9 @@ function HomePage() {
   );
 }
 
-export default function App() {
+function PublicSite() {
   const [loading, setLoading] = useState(true);
+  const preload = usePreloadAssets();
 
   useEffect(() => {
     const lenis = new Lenis({
@@ -115,33 +118,48 @@ export default function App() {
   }, []);
 
   return (
+    <>
+      <SEO />
+      <ScrollToTop />
+      <div className="bg-black min-h-screen text-white selection:bg-[#D4AF37] selection:text-black font-sans">
+        <AmbientBackground />
+        {loading ? (
+          <Preloader
+            onComplete={() => setLoading(false)}
+            realProgress={preload.progress}
+            assetsLoaded={preload.loaded}
+          />
+        ) : (
+          <>
+            <Navbar />
+            <main>
+              <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/story" element={
+                   <Suspense fallback={<LoadingFallback />}>
+                     <About />
+                   </Suspense>
+                } />
+              </Routes>
+            </main>
+            <Suspense fallback={null}>
+              <Footer />
+            </Suspense>
+          </>
+        )}
+      </div>
+    </>
+  );
+}
+
+export default function App() {
+  return (
     <HelmetProvider>
       <Router>
-        <SEO />
-        <ScrollToTop />
-        <div className="bg-black min-h-screen text-white selection:bg-[#D4AF37] selection:text-black font-sans">
-          <AmbientBackground />
-          {loading ? (
-            <Preloader onComplete={() => setLoading(false)} />
-          ) : (
-            <>
-              <Navbar />
-              <main>
-                <Routes>
-                  <Route path="/" element={<HomePage />} />
-                  <Route path="/story" element={
-                     <Suspense fallback={<LoadingFallback />}>
-                       <About />
-                     </Suspense>
-                  } />
-                </Routes>
-              </main>
-              <Suspense fallback={null}>
-                <Footer />
-              </Suspense>
-            </>
-          )}
-        </div>
+        <Routes>
+          <Route path="/ashtaar-admin/*" element={<AdminApp />} />
+          <Route path="/*" element={<PublicSite />} />
+        </Routes>
       </Router>
     </HelmetProvider>
   );

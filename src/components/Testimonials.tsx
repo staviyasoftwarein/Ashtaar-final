@@ -1,63 +1,22 @@
 import { useRef, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { VolumeX, Volume2, Play, Quote, ChevronLeft, ChevronRight } from 'lucide-react';
-
-const testimonials = [
-  {
-    type: 'video',
-    src: "/TestiVideo1.mp4",
-    quote: "They brought our cinematic vision to life with zero compromise. The process was as artistic as the result.",
-    author: "Elena Vance",
-    role: "Production Lead, Aether Studios",
-    thumbnail: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=800&q=80"
-  },
-  {
-    type: 'image',
-    src: "/Testimonial1.jpeg",
-    quote: "ASHTAAR doesn't just film; they capture the soul of the narrative. A truly world-class experience.",
-    author: "Marcus Thorne",
-    role: "Creative Director",
-    thumbnail: "/Testimonial1.jpeg"
-  },
-  {
-    type: 'video',
-    src: "/TestiVideo2.mp4",
-    quote: "A seamless, breathtaking production process from day one. Their attention to detail is frightening.",
-    author: "Sarah Jenkins",
-    role: "Executive Producer",
-    thumbnail: "https://images.unsplash.com/photo-1492691523567-6170c81efc30?auto=format&fit=crop&w=800&q=80"
-  },
-  {
-    type: 'image',
-    src: "/Testimonial2.jpeg",
-    quote: "The visual fidelity they achieved exceeded our wildest expectations. Pure cinematic magic.",
-    author: "David Chen",
-    role: "Independent Filmmaker",
-    thumbnail: "/Testimonial2.jpeg"
-  },
-  {
-    type: 'video',
-    src: "/TestiVideo3.mp4",
-    quote: "The final cut was an absolute masterpiece. They understood the rhythm of our story perfectly.",
-    author: "Julian Ross",
-    role: "Showrunner",
-    thumbnail: "https://images.unsplash.com/photo-1533619043845-dfc67753b820?auto=format&fit=crop&w=800&q=80"
-  },
-  {
-    type: 'image',
-    src: "/Testimonial3.jpeg",
-    quote: "Innovation meets tradition. ASHTAAR is the future of digital storytelling.",
-    author: "Aria Montgomery",
-    role: "Marketing Head",
-    thumbnail: "/Testimonial3.jpeg"
-  }
-];
+import { VolumeX, Volume2, Quote, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useSetting } from '../hooks/useSetting';
+import { DEFAULT_TESTIMONIALS, resolveTestimonialMediaUrl, type TestimonialsConfig } from '../lib/testimonials';
 
 export default function Testimonials() {
+  const { value: cfg } = useSetting<TestimonialsConfig>('testimonials', DEFAULT_TESTIMONIALS);
+  const testimonials = cfg.items.length > 0 ? cfg.items : DEFAULT_TESTIMONIALS.items;
+
   const [index, setIndex] = useState(0);
   const [isMuted, setIsMuted] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [direction, setDirection] = useState(0);
+
+  // Clamp index when items list shrinks via admin
+  useEffect(() => {
+    if (index >= testimonials.length) setIndex(0);
+  }, [testimonials.length, index]);
 
   const next = () => {
     setDirection(1);
@@ -76,7 +35,8 @@ export default function Testimonials() {
     }
   }, [index]);
 
-  const current = testimonials[index];
+  const current = testimonials[index] ?? testimonials[0];
+  const mediaUrl = resolveTestimonialMediaUrl(current?.mediaPath ?? '');
 
   return (
     <section id="testimonials" className="min-h-screen bg-[#fafaf9] text-gray-900 py-24 md:py-32 relative overflow-hidden flex flex-col justify-center">
@@ -119,30 +79,36 @@ export default function Testimonials() {
                 transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
                 className="w-full h-full rounded-2xl overflow-hidden shadow-2xl shadow-black/10 border border-black/5 relative bg-white"
               >
-                {current.type === 'video' ? (
+                {current?.mediaKind === 'video' && mediaUrl ? (
                   <>
                     <video
+                      key={mediaUrl}
                       ref={videoRef}
-                      src={current.src}
+                      src={mediaUrl}
                       autoPlay
                       muted={isMuted}
                       loop
                       playsInline
                       className="w-full h-full object-cover"
                     />
-                    <button 
+                    <button
                       onClick={() => setIsMuted(!isMuted)}
+                      aria-label={isMuted ? 'Unmute video' : 'Mute video'}
                       className="absolute bottom-6 right-6 p-4 rounded-full bg-white/40 backdrop-blur-md border border-black/10 hover:bg-white/60 transition-all z-20 text-black"
                     >
                       {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5 text-[#D4AF37]" />}
                     </button>
                   </>
-                ) : (
-                  <img 
-                    src={current.src} 
-                    alt={current.author} 
+                ) : mediaUrl ? (
+                  <img
+                    src={mediaUrl}
+                    alt={current?.author ?? ''}
                     className="w-full h-full object-cover"
                   />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-gray-400 font-mono text-xs uppercase tracking-[0.2em] bg-gray-100">
+                    No media uploaded
+                  </div>
                 )}
                 
                 {/* Overlay Gradient */}
@@ -192,13 +158,13 @@ export default function Testimonials() {
                 >
                   <Quote className="w-12 h-12 md:w-16 md:h-16 text-[#D4AF37]/10 mb-6" />
                   <p className="font-serif text-2xl md:text-3xl lg:text-4xl leading-tight italic text-gray-800">
-                    "{current.quote}"
+                    "{current?.quote}"
                   </p>
-                  
+
                   <div className="mt-10 md:mt-12 flex items-center gap-6">
                     <div>
-                      <h4 className="text-xl md:text-2xl font-bold font-serif text-gray-900">{current.author}</h4>
-                      <p className="text-[#D4AF37] text-xs md:text-sm uppercase tracking-widest font-sans mt-1">{current.role}</p>
+                      <h4 className="text-xl md:text-2xl font-bold font-serif text-gray-900">{current?.author}</h4>
+                      <p className="text-[#D4AF37] text-xs md:text-sm uppercase tracking-widest font-sans mt-1">{current?.role}</p>
                     </div>
                   </div>
                 </motion.div>
