@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom';
-import { Film, Briefcase, MessageSquare, Users, Settings, LogOut, Image as ImageIcon, BookOpen, Camera, BriefcaseBusiness, Newspaper } from 'lucide-react';
+import { Film, Briefcase, MessageSquare, Users, Settings, LogOut, Image as ImageIcon, BookOpen, Camera, BriefcaseBusiness, Newspaper, Banknote } from 'lucide-react';
 import { useAdminAuth } from '../hooks/useAdminAuth';
 
 type NavItem = {
@@ -18,6 +18,7 @@ const NAV: NavItem[] = [
   { to: '/ashtaar-admin/bts',         label: 'Behind Scenes',icon: Camera },
   { to: '/ashtaar-admin/careers',     label: 'Careers',      icon: BriefcaseBusiness },
   { to: '/ashtaar-admin/blog',        label: 'Journal',      icon: Newspaper },
+  { to: '/ashtaar-admin/investment',  label: 'Investment',   icon: Banknote },
   { to: '/ashtaar-admin/media',       label: 'Media Library',icon: ImageIcon,    disabled: true },
 ];
 

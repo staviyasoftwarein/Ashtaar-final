@@ -10,6 +10,7 @@ import TeamEditor from './pages/TeamEditor';
 import BtsEditor from './pages/BtsEditor';
 import CareersEditor from './pages/CareersEditor';
 import BlogEditor from './pages/BlogEditor';
+import InvestmentEditor from './pages/InvestmentEditor';
 
 function AuthGate({ children }: { children: React.ReactNode }) {
   const { loading, isAdmin } = useAdminAuth();
@@ -50,6 +51,7 @@ export default function AdminApp() {
           <Route path="careers" element={<CareersEditor />} />
           <Route path="bts" element={<BtsEditor />} />
           <Route path="blog" element={<BlogEditor />} />
+          <Route path="investment" element={<InvestmentEditor />} />
           <Route path="*" element={<Navigate to="hero" replace />} />
         </Routes>
       </AdminLayout>
