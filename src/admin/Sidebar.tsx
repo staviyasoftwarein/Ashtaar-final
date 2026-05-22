@@ -15,7 +15,7 @@ const NAV: NavItem[] = [
   { to: '/ashtaar-admin/testimonials',label: 'Testimonials', icon: MessageSquare },
   { to: '/ashtaar-admin/story',       label: 'The Story',    icon: BookOpen },
   { to: '/ashtaar-admin/team',        label: 'Team',         icon: Users },
-  { to: '/ashtaar-admin/bts',         label: 'Behind Scenes',icon: Camera },
+  { to: '/ashtaar-admin/bts',         label: 'Behind the Scenes',icon: Camera },
   { to: '/ashtaar-admin/careers',     label: 'Careers',      icon: BriefcaseBusiness },
   { to: '/ashtaar-admin/blog',        label: 'Journal',      icon: Newspaper },
   { to: '/ashtaar-admin/investment',  label: 'Investment',   icon: Banknote },

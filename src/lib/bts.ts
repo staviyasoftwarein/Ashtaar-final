@@ -1,9 +1,20 @@
 import { publicUrl } from './supabase';
 
 export type BtsImage = {
-  id: string;        // stable slot "1".."8" — used to derive bucket filename
+  id: string;        // stable slot "1".."15" — used to derive bucket filename
   imagePath: string; // bucket path (e.g. "bts/bts1.jpeg"), legacy "/file", or external URL
 };
+
+/** Max images allowed in the BTS gallery. */
+export const BTS_MAX_IMAGES = 15;
+
+/** Lowest unused id (1..). Reuses freed slots so bucket names stay compact. */
+export function nextBtsId(images: BtsImage[]): string {
+  const used = new Set(images.map((img) => img.id));
+  let i = 1;
+  while (used.has(String(i))) i++;
+  return String(i);
+}
 
 export type BtsConfig = {
   eyebrow: string;

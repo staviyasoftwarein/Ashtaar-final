@@ -1,3 +1,7 @@
+import { publicUrl } from './supabase';
+
+export type BlogMediaKind = 'image' | 'video';
+
 export type BlogPost = {
   id: string;
   title: string;
@@ -7,7 +11,22 @@ export type BlogPost = {
   comments: number;
   excerpt: string;     // shown on the public card + in the modal list
   content: string;     // shown inside the modal when a post is opened
+  /** Bucket path inside 'media' (e.g. "blog/post_1.jpeg"), legacy "/file" path, or external URL. Empty = no media. */
+  mediaPath: string;
+  mediaKind: BlogMediaKind;
 };
+
+/** Resolve a stored path to a usable URL.
+ *  - Empty           → empty string
+ *  - http(s)://...   → return as-is (external CDN)
+ *  - /file           → legacy public/ asset (Vite serves it)
+ *  - other           → treat as 'media' bucket path */
+export function resolveBlogMediaUrl(path: string): string {
+  if (!path) return '';
+  if (/^https?:\/\//i.test(path)) return path;
+  if (path.startsWith('/')) return path;
+  return publicUrl('media', path);
+}
 
 /** Today's date as "YYYY-MM-DD" in the local timezone (matches what
  *  an <input type="date"> picker expects and produces). */
@@ -61,6 +80,8 @@ export const DEFAULT_BLOG: BlogConfig = {
       comments: 42,
       excerpt: 'Exploring our founding philosophy and how Ashtaar Films aims to bring authentic regional stories to the global stage...',
       content: "The world of cinema is constantly evolving, yet the core principles of storytelling remain eternal. In this piece, we explore the intricate balance between technical mastery and emotional resonance. Our approach at Ashtaar Films is rooted in a deep understanding of human experience, translated through the meticulous craft of filmmaking. Every frame is a deliberate choice, every sound carefully orchestrated to immerse the audience in a reality that is both constructed and profoundly authentic. We believe that true cinematic art doesn't just show a story; it makes you feel it in your bones.",
+      mediaPath: '',
+      mediaKind: 'image',
     },
     {
       id: '2',
@@ -70,6 +91,8 @@ export const DEFAULT_BLOG: BlogConfig = {
       comments: 18,
       excerpt: 'A deep dive into the rigorous production process and collaborative spirit that define an Ashtaar Films set...',
       content: "The world of cinema is constantly evolving, yet the core principles of storytelling remain eternal. In this piece, we explore the intricate balance between technical mastery and emotional resonance. Our approach at Ashtaar Films is rooted in a deep understanding of human experience, translated through the meticulous craft of filmmaking. Every frame is a deliberate choice, every sound carefully orchestrated to immerse the audience in a reality that is both constructed and profoundly authentic. We believe that true cinematic art doesn't just show a story; it makes you feel it in your bones.",
+      mediaPath: '',
+      mediaKind: 'image',
     },
     {
       id: '3',
@@ -79,6 +102,8 @@ export const DEFAULT_BLOG: BlogConfig = {
       comments: 34,
       excerpt: 'How we are discovering, funding, and supporting the next generation of visionary storytellers from the region...',
       content: "The world of cinema is constantly evolving, yet the core principles of storytelling remain eternal. In this piece, we explore the intricate balance between technical mastery and emotional resonance. Our approach at Ashtaar Films is rooted in a deep understanding of human experience, translated through the meticulous craft of filmmaking. Every frame is a deliberate choice, every sound carefully orchestrated to immerse the audience in a reality that is both constructed and profoundly authentic. We believe that true cinematic art doesn't just show a story; it makes you feel it in your bones.",
+      mediaPath: '',
+      mediaKind: 'image',
     },
     {
       id: '4',
@@ -88,6 +113,8 @@ export const DEFAULT_BLOG: BlogConfig = {
       comments: 21,
       excerpt: 'Exploring the psychological impact of audio and silence in modern thriller filmmaking...',
       content: "Sound design is often the unsung hero of a compelling thriller. It's not just about loud noises or jump scares; it's about the tension created by what you don't hear. The deliberate absence of sound—the silence—can be more terrifying than the most dramatic orchestral swell. In our recent productions, we've focused on utilizing silence as a narrative tool, forcing the audience to lean into the quiet moments, heightening their senses and making the eventual auditory impact that much more visceral.",
+      mediaPath: '',
+      mediaKind: 'image',
     },
     {
       id: '5',
@@ -97,6 +124,8 @@ export const DEFAULT_BLOG: BlogConfig = {
       comments: 15,
       excerpt: 'The journey of a story from the first draft to the final shooting script...',
       content: "A script is a living document, a blueprint for a world that does not yet exist. Our script development process is rigorous, collaborative, and entirely driven by character. We don't just write dialogue; we sculpt subtext. From the initial outlining phase to the countless revisions and table reads, every word is tested for authenticity and dramatic weight. We believe that the foundation of any great film is a script that is so solid, it allows the director and actors the freedom to truly soar.",
+      mediaPath: '',
+      mediaKind: 'image',
     },
     {
       id: '6',
@@ -106,6 +135,8 @@ export const DEFAULT_BLOG: BlogConfig = {
       comments: 56,
       excerpt: 'Breaking down the intricate lighting setups from our most visually striking scenes...',
       content: "Cinematography is painting with light, but it's equally about mastering the shadows. The absence of light defines depth, mood, and mystery. In this deep dive, we explore how our cinematographers use shadow to conceal and reveal, guiding the viewer's eye and manipulating their emotional response. We examine specific setups from our films, analyzing the placement of every fixture and flag, to demonstrate how a nuanced approach to lighting can elevate a scene from standard coverage to true cinematic art.",
+      mediaPath: '',
+      mediaKind: 'image',
     },
   ],
 };

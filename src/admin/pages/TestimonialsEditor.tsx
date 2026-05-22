@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Upload, X, Volume2, VolumeX } from 'lucide-react';
+import { Upload, X, Volume2, VolumeX, Trash2, Plus } from 'lucide-react';
 import { useSetting } from '../../hooks/useSetting';
 import { uploadToMediaBucket, fileExtension, tryDeleteFromMediaBucket } from '../../lib/storageUpload';
 import {
@@ -33,6 +33,32 @@ export default function TestimonialsEditor() {
     setDraft({ ...draft, items });
   };
 
+  const nextId = (): string => {
+    const nums = draft.items.map((t) => Number(t.id)).filter((n) => Number.isFinite(n));
+    const max = nums.length ? Math.max(...nums) : 0;
+    return String(max + 1);
+  };
+
+  const addItem = () => {
+    const item: Testimonial = {
+      id: nextId(),
+      quote: '',
+      author: '',
+      role: '',
+      avatarPath: '',
+      mediaPath: '',
+      mediaKind: 'image',
+    };
+    setDraft({ ...draft, items: [...draft.items, item] });
+  };
+
+  const removeItem = async (i: number) => {
+    const target = draft.items[i];
+    if (target?.avatarPath) await tryDeleteFromMediaBucket(target.avatarPath);
+    if (target?.mediaPath) await tryDeleteFromMediaBucket(target.mediaPath);
+    setDraft({ ...draft, items: draft.items.filter((_, idx) => idx !== i) });
+  };
+
   const onSave = async () => {
     setBusy(true);
     setMsg(null);
@@ -51,7 +77,8 @@ export default function TestimonialsEditor() {
       <header>
         <h2 className="font-serif text-3xl text-white tracking-tight">Testimonials</h2>
         <p className="mt-1 text-sm text-[#A3A3A3] font-sans">
-          Six client voices. Each has a quote, an author, an avatar, and a hero media (image or video).
+          Client voices. Each has a quote, an author, an avatar, and a hero media (image or video).
+          Add, edit, or remove as many as you like — changes show on the public carousel.
         </p>
       </header>
 
@@ -62,6 +89,17 @@ export default function TestimonialsEditor() {
             title={`${String(i + 1).padStart(2, '0')} — ${t.author || 'Untitled testimonial'}`}
             hint={t.role || undefined}
           >
+            <div className="flex justify-end -mt-2 mb-2">
+              <button
+                type="button"
+                onClick={() => removeItem(i)}
+                className="inline-flex items-center gap-1.5 text-xs font-sans text-[#A3A3A3] hover:text-red-400 transition-colors px-2 py-1 rounded-md hover:bg-red-500/5"
+                aria-label={`Delete testimonial ${i + 1}`}
+                title="Delete testimonial"
+              >
+                <Trash2 size={14} /> Delete
+              </button>
+            </div>
             <div className="grid lg:grid-cols-[1fr_220px] gap-6">
               <div className="space-y-5">
                 <Field label="Quote">
@@ -113,6 +151,14 @@ export default function TestimonialsEditor() {
             </div>
           </Card>
         ))}
+
+        <button
+          type="button"
+          onClick={addItem}
+          className="w-full inline-flex items-center justify-center gap-2 h-14 rounded-xl border border-dashed border-[var(--color-line-strong)] text-sm font-sans text-[#A3A3A3] hover:text-[var(--color-gold)] hover:border-[var(--color-gold)] transition-colors"
+        >
+          <Plus size={16} /> Add testimonial
+        </button>
       </div>
 
       {msg && <Toast kind={msg.kind}>{msg.text}</Toast>}

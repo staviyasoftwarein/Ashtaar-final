@@ -2,7 +2,17 @@ import { useRef, useState, useEffect } from 'react';
 import { motion, useScroll, useTransform, AnimatePresence } from 'motion/react';
 import { ArrowUpRight, Clock, MessageSquare, ChevronRight, X } from 'lucide-react';
 import { useSetting } from '../hooks/useSetting';
-import { DEFAULT_BLOG, formatBlogDate, type BlogConfig, type BlogPost } from '../lib/blog';
+import { DEFAULT_BLOG, formatBlogDate, resolveBlogMediaUrl, type BlogConfig, type BlogPost } from '../lib/blog';
+
+function BlogMedia({ post, className }: { post: BlogPost; className?: string }) {
+  const url = resolveBlogMediaUrl(post.mediaPath ?? '');
+  if (!url) return null;
+  return post.mediaKind === 'video' ? (
+    <video src={url} autoPlay loop muted playsInline className={className} />
+  ) : (
+    <img src={url} alt={post.title} className={className} />
+  );
+}
 
 export default function Blog() {
   const { value: cfg } = useSetting<BlogConfig>('blog', DEFAULT_BLOG);
@@ -71,6 +81,11 @@ export default function Blog() {
               }}
               className="group cursor-pointer flex flex-col border-t border-black/10 pt-8 hover:bg-white hover:shadow-2xl hover:shadow-black/5 p-6 md:p-8 -m-6 md:-m-8 rounded-2xl transition-all duration-500 hover:-translate-y-2 h-full relative z-0 hover:z-10"
             >
+              {resolveBlogMediaUrl(post.mediaPath ?? '') && (
+                <div className="mb-6 -mt-2 aspect-video w-full rounded-xl overflow-hidden bg-gray-100">
+                  <BlogMedia post={post} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                </div>
+              )}
               <div className="flex flex-wrap items-center gap-4 text-[10px] text-gray-500 uppercase tracking-[0.2em] font-mono mb-6 group-hover:text-gray-900 transition-colors">
                 <span className="flex items-center gap-2"><Clock className="w-3 h-3" /> {formatBlogDate(post.date)}</span>
                 <span className="flex items-center gap-2"><MessageSquare className="w-3 h-3" /> {post.comments}</span>
@@ -151,6 +166,11 @@ export default function Blog() {
                            <Clock className="w-3.5 h-3.5" /> {formatBlogDate(selectedPost.date)}
                          </span>
                       </div>
+                      {resolveBlogMediaUrl(selectedPost.mediaPath ?? '') && (
+                        <div className="mb-8 aspect-video w-full rounded-2xl overflow-hidden bg-gray-100 shadow-lg">
+                          <BlogMedia post={selectedPost} className="w-full h-full object-cover" />
+                        </div>
+                      )}
                       <h2 className="font-serif text-4xl leading-tight mb-8 text-gray-900">{selectedPost.title}</h2>
                       <div className="text-lg leading-relaxed text-gray-700 font-sans space-y-6">
                         <p>{selectedPost.content}</p>
@@ -173,6 +193,11 @@ export default function Blog() {
                           onClick={() => setSelectedPost(post)}
                           className="group cursor-pointer flex flex-col md:flex-row md:items-center gap-4 md:gap-8 p-6 md:p-8 rounded-xl bg-white hover:bg-[#fafaf9] shadow-sm hover:shadow-md border border-black/5 hover:border-black/10 transition-all duration-300 hover:-translate-y-1"
                         >
+                          {resolveBlogMediaUrl(post.mediaPath ?? '') && (
+                            <div className="shrink-0 w-full md:w-40 aspect-video rounded-lg overflow-hidden bg-gray-100">
+                              <BlogMedia post={post} className="w-full h-full object-cover" />
+                            </div>
+                          )}
                           <div className="flex-1">
                             <div className="flex items-center gap-4 text-[10px] text-gray-500 uppercase tracking-wider font-mono mb-3">
                               <span className="flex items-center gap-1.5"><Clock className="w-3 h-3" /> {formatBlogDate(post.date)}</span>

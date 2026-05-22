@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Upload, X } from 'lucide-react';
+import { Upload, X, Plus, Trash2 } from 'lucide-react';
 import { useSetting } from '../../hooks/useSetting';
 import { uploadToMediaBucket, fileExtension, tryDeleteFromMediaBucket } from '../../lib/storageUpload';
-import { DEFAULT_BTS, resolveBtsImageUrl, type BtsConfig, type BtsImage } from '../../lib/bts';
+import { BTS_MAX_IMAGES, DEFAULT_BTS, nextBtsId, resolveBtsImageUrl, type BtsConfig, type BtsImage } from '../../lib/bts';
 import { Button, Card, Field, Input, Toast } from '../components/ui';
 
 function deepEqual<T>(a: T, b: T) {
@@ -25,6 +25,18 @@ export default function BtsEditor() {
     setDraft({ ...draft, images });
   };
 
+  const addImage = () => {
+    if (draft.images.length >= BTS_MAX_IMAGES) return;
+    const id = nextBtsId(draft.images);
+    setDraft({ ...draft, images: [...draft.images, { id, imagePath: '' }] });
+  };
+
+  const removeImage = async (i: number) => {
+    const target = draft.images[i];
+    if (target?.imagePath) await tryDeleteFromMediaBucket(target.imagePath);
+    setDraft({ ...draft, images: draft.images.filter((_, idx) => idx !== i) });
+  };
+
   const onSave = async () => {
     setBusy(true);
     setMsg(null);
@@ -41,7 +53,7 @@ export default function BtsEditor() {
   return (
     <div className="space-y-8 pb-32">
       <header>
-        <h2 className="font-serif text-3xl text-white tracking-tight">Behind The Scenes</h2>
+        <h2 className="font-serif text-3xl text-white tracking-tight">Behind the Scenes</h2>
         <p className="mt-1 text-sm text-[#A3A3A3] font-sans">
           The "Vision beyond the lens" 3D scroll gallery — eyebrow, headline, and {draft.images.length} images.
         </p>
@@ -66,7 +78,7 @@ export default function BtsEditor() {
         </div>
       </Card>
 
-      <Card title={`Images (${draft.images.length})`} hint="Each tile flies into view as the user scrolls. Files are stored in the bucket as bts/bts{n}.{ext} — replacing with a different format auto-removes the previous file.">
+      <Card title={`Images (${draft.images.length} / ${BTS_MAX_IMAGES})`} hint="Each tile flies into view as the user scrolls. Files are stored in the bucket as bts/bts{n}.{ext} — replacing with a different format auto-removes the previous file. Add up to 15; the gallery adapts to the count.">
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {draft.images.map((img, i) => (
             <BtsTile
@@ -75,8 +87,20 @@ export default function BtsEditor() {
               imageId={img.id || String(i + 1)}
               imagePath={img.imagePath}
               onChange={(p) => updateImage(i, { imagePath: p })}
+              onRemoveSlot={() => removeImage(i)}
             />
           ))}
+
+          {draft.images.length < BTS_MAX_IMAGES && (
+            <button
+              type="button"
+              onClick={addImage}
+              className="aspect-[16/9] rounded-md border border-dashed border-[var(--color-line-strong)] flex flex-col items-center justify-center gap-2 text-[#A3A3A3] hover:text-[var(--color-gold)] hover:border-[var(--color-gold)] transition-colors self-start"
+            >
+              <Plus size={20} strokeWidth={1.5} />
+              <span className="text-[10px] font-mono uppercase tracking-[0.2em]">add image</span>
+            </button>
+          )}
         </div>
       </Card>
 
@@ -111,11 +135,13 @@ function BtsTile({
   imageId,
   imagePath,
   onChange,
+  onRemoveSlot,
 }: {
   index: number;
   imageId: string;
   imagePath: string;
   onChange: (path: string) => void;
+  onRemoveSlot: () => void;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
@@ -200,18 +226,30 @@ function BtsTile({
         {imagePath || `bts/bts${imageId}.{ext}`}
       </p>
 
-      {imagePath && !busy && (
+      <div className="flex items-center justify-between gap-2">
+        {imagePath && !busy ? (
+          <button
+            type="button"
+            onClick={async () => {
+              await tryDeleteFromMediaBucket(imagePath);
+              onChange('');
+            }}
+            className="text-[11px] font-sans text-[#A3A3A3] hover:text-red-400 transition-colors inline-flex items-center gap-1"
+          >
+            <X size={12} /> Clear image
+          </button>
+        ) : <span />}
+
         <button
           type="button"
-          onClick={async () => {
-            await tryDeleteFromMediaBucket(imagePath);
-            onChange('');
-          }}
-          className="text-[11px] font-sans text-[#A3A3A3] hover:text-red-400 transition-colors inline-flex items-center gap-1"
+          disabled={busy}
+          onClick={onRemoveSlot}
+          className="text-[11px] font-sans text-[#A3A3A3] hover:text-red-400 transition-colors inline-flex items-center gap-1 disabled:opacity-40"
+          title="Delete this slot"
         >
-          <X size={12} /> Remove
+          <Trash2 size={12} /> Delete slot
         </button>
-      )}
+      </div>
       {error && <p className="text-xs text-red-400">{error}</p>}
     </div>
   );

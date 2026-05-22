@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Plus, Trash2, ChevronUp, ChevronDown } from 'lucide-react';
+import { Plus, Trash2, ChevronUp, ChevronDown, Upload, X, Volume2, VolumeX } from 'lucide-react';
 import { useSetting } from '../../hooks/useSetting';
-import { DEFAULT_BLOG, formatBlogDate, nextBlogId, todayIsoDate, toIsoDate, type BlogConfig, type BlogPost } from '../../lib/blog';
+import { uploadToMediaBucket, fileExtension, tryDeleteFromMediaBucket } from '../../lib/storageUpload';
+import { DEFAULT_BLOG, formatBlogDate, nextBlogId, resolveBlogMediaUrl, todayIsoDate, toIsoDate, type BlogConfig, type BlogPost } from '../../lib/blog';
 import { Button, Card, Field, Input, Textarea, Toast } from '../components/ui';
 
 function deepEqual<T>(a: T, b: T) {
@@ -34,7 +35,7 @@ export default function BlogEditor() {
       // to the top so they appear newest-first on next mount.
       posts: [
         ...draft.posts,
-        { id, title: '', category: '', date: todayIsoDate(), comments: 0, excerpt: '', content: '' },
+        { id, title: '', category: '', date: todayIsoDate(), comments: 0, excerpt: '', content: '', mediaPath: '', mediaKind: 'image' },
       ],
     });
     setSessionNew((prev) => {
@@ -44,7 +45,9 @@ export default function BlogEditor() {
     });
   };
 
-  const removePost = (i: number) => {
+  const removePost = async (i: number) => {
+    const target = draft.posts[i];
+    if (target?.mediaPath) await tryDeleteFromMediaBucket(target.mediaPath);
     setDraft({ ...draft, posts: draft.posts.filter((_, idx) => idx !== i) });
   };
 
@@ -153,6 +156,18 @@ export default function BlogEditor() {
                       onChange={(e) => updatePost(i, { content: e.target.value })}
                     />
                   </Field>
+
+                  <div className="pt-2 border-t border-[var(--color-line)]">
+                    <p className="text-xs font-sans uppercase tracking-[0.18em] text-[#A3A3A3] mb-3 mt-4">
+                      Cover media — image or video (replaces previous file)
+                    </p>
+                    <BlogMediaUploader
+                      postId={post.id}
+                      mediaPath={post.mediaPath}
+                      mediaKind={post.mediaKind}
+                      onChange={(mediaPath, mediaKind) => updatePost(i, { mediaPath, mediaKind })}
+                    />
+                  </div>
                 </div>
 
                 <div className="flex md:flex-col items-center md:items-end gap-3 self-start shrink-0">
@@ -221,6 +236,163 @@ export default function BlogEditor() {
           </motion.div>
         )}
       </AnimatePresence>
+    </div>
+  );
+}
+
+/* ─── Blog cover media uploader (image or video) ───────── */
+function BlogMediaUploader({
+  postId,
+  mediaPath,
+  mediaKind,
+  onChange,
+}: {
+  postId: string;
+  mediaPath: string;
+  mediaKind: 'image' | 'video';
+  onChange: (path: string, kind: 'image' | 'video') => void;
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [dragOver, setDragOver] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [previewBust, setPreviewBust] = useState(0);
+  const [error, setError] = useState<string | null>(null);
+  const [muted, setMuted] = useState(true);
+
+  const url = mediaPath
+    ? `${resolveBlogMediaUrl(mediaPath)}${previewBust ? (mediaPath.includes('?') ? `&v=${previewBust}` : `?v=${previewBust}`) : ''}`
+    : '';
+
+  const onPick = async (file?: File) => {
+    if (!file) return;
+    const isVideo = file.type.startsWith('video/');
+    const isImage = file.type.startsWith('image/');
+    if (!isVideo && !isImage) {
+      setError('Please choose an image or video file.');
+      return;
+    }
+    setBusy(true);
+    setProgress(0);
+    setError(null);
+    try {
+      const ext = fileExtension(file.name) || (file.type.split('/')[1] ?? (isVideo ? 'mp4' : 'jpg'));
+      const path = `blog/post_${postId}.${ext}`;
+      if (mediaPath && mediaPath !== path) {
+        await tryDeleteFromMediaBucket(mediaPath);
+      }
+      await uploadToMediaBucket({
+        file,
+        path,
+        contentType: file.type,
+        onProgress: setProgress,
+      });
+      onChange(path, isVideo ? 'video' : 'image');
+      setPreviewBust(Date.now());
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Upload failed');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      {url && (
+        <div className="grid md:grid-cols-[200px_1fr] gap-4 items-start">
+          <div className="aspect-video rounded-md overflow-hidden border border-[var(--color-line)] bg-black relative">
+            {mediaKind === 'video' ? (
+              <>
+                <video
+                  key={url}
+                  src={url}
+                  autoPlay
+                  loop
+                  muted={muted}
+                  playsInline
+                  className="w-full h-full object-cover"
+                />
+                <button
+                  type="button"
+                  onClick={() => setMuted((m) => !m)}
+                  aria-label={muted ? 'Unmute preview' : 'Mute preview'}
+                  className="absolute bottom-2 right-2 w-8 h-8 rounded-full bg-black/60 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white hover:bg-black/80 transition-colors"
+                >
+                  {muted ? <VolumeX size={14} /> : <Volume2 size={14} />}
+                </button>
+              </>
+            ) : (
+              <img src={url} alt="" className="w-full h-full object-cover" />
+            )}
+          </div>
+          <div className="min-w-0 space-y-2">
+            <p className="text-[11px] font-mono text-[#A3A3A3] truncate">{mediaPath}</p>
+            <p className="text-[11px] font-sans text-[#525252]">
+              Type: <span className="text-white uppercase tracking-[0.2em] font-mono">{mediaKind}</span>
+            </p>
+            <button
+              type="button"
+              disabled={busy}
+              onClick={async () => {
+                await tryDeleteFromMediaBucket(mediaPath);
+                onChange('', mediaKind);
+              }}
+              className="inline-flex items-center gap-1.5 text-xs text-[#A3A3A3] hover:text-red-400 transition-colors"
+            >
+              <X size={13} /> Remove media
+            </button>
+          </div>
+        </div>
+      )}
+
+      <div
+        onDragOver={(e) => { if (busy) return; e.preventDefault(); setDragOver(true); }}
+        onDragLeave={() => setDragOver(false)}
+        onDrop={(e) => {
+          if (busy) return;
+          e.preventDefault();
+          setDragOver(false);
+          onPick(e.dataTransfer.files?.[0]);
+        }}
+        onClick={() => { if (!busy) inputRef.current?.click(); }}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => { if ((e.key === 'Enter' || e.key === ' ') && !busy) inputRef.current?.click(); }}
+        className={[
+          'rounded-lg border-2 border-dashed transition-all duration-200',
+          'flex flex-col items-center justify-center gap-2 py-6 px-6 text-center cursor-pointer',
+          dragOver
+            ? 'border-[var(--color-gold)] bg-[var(--color-gold)]/[0.05]'
+            : 'border-[var(--color-line-strong)] hover:border-[var(--color-gold)]/60 bg-[var(--color-surface-2)]',
+          busy && 'cursor-wait opacity-70',
+        ].join(' ')}
+      >
+        <Upload size={18} strokeWidth={1.5} className="text-[var(--color-gold)]" />
+        <p className="text-sm text-white font-sans">
+          {mediaPath ? 'Replace media' : (dragOver ? 'Drop to upload' : 'Drop a file or click to choose')}
+        </p>
+        <p className="text-[11px] font-sans uppercase tracking-[0.2em] text-[#525252]">
+          Image (JPG · PNG · WEBP) or Video (MP4 · WEBM · MOV)
+        </p>
+        <input
+          ref={inputRef}
+          type="file"
+          accept="image/*,video/*"
+          className="hidden"
+          onChange={(e) => onPick(e.target.files?.[0] ?? undefined)}
+        />
+      </div>
+
+      {busy && (
+        <div className="space-y-1">
+          <div className="h-1.5 rounded-full bg-[var(--color-surface-2)] overflow-hidden">
+            <div className="h-full bg-[var(--color-gold)] transition-[width] duration-150" style={{ width: `${progress}%` }} />
+          </div>
+          <p className="text-xs font-mono text-[#A3A3A3]">{progress}%</p>
+        </div>
+      )}
+
+      {error && <p className="text-xs text-red-400 font-sans">{error}</p>}
     </div>
   );
 }
