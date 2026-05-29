@@ -116,6 +116,11 @@ export default function InvestmentEditor() {
   };
 
   const onSave = async () => {
+    const email = draft.contactEmail.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setMsg({ kind: 'error', text: 'Enter a valid contact email before saving.' });
+      return;
+    }
     setBusy(true);
     setMsg(null);
     try {

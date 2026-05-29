@@ -13,19 +13,40 @@ export type UploadOpts = {
   cacheControl?: string;
   /** 0..100 progress callback. */
   onProgress?: (pct: number) => void;
+  /** Reject files larger than this many bytes before uploading. Default 200 MB. */
+  maxBytes?: number;
 };
+
+const DEFAULT_MAX_BYTES = 200 * 1024 * 1024; // 200 MB
+
+/** Encode a bucket path safely: reject traversal/absolute paths, encode each segment. */
+function safeBucketPath(rawPath: string): string {
+  const path = rawPath.replace(/^\/+/, '');
+  const segments = path.split('/');
+  for (const seg of segments) {
+    if (seg === '' || seg === '.' || seg === '..') {
+      throw new Error(`Invalid upload path segment: "${seg}"`);
+    }
+  }
+  return segments.map(encodeURIComponent).join('/');
+}
 
 /** Uploads a file to the public 'media' bucket via Supabase Storage REST.
  *  Uses XHR so we get real upload-progress events.
  *  Requires the current session to belong to an admin (RLS enforces this server-side). */
 export async function uploadToMediaBucket(opts: UploadOpts): Promise<void> {
+  const maxBytes = opts.maxBytes ?? DEFAULT_MAX_BYTES;
+  if (opts.file.size > maxBytes) {
+    throw new Error(`File too large: ${(opts.file.size / 1048576).toFixed(1)} MB (max ${Math.round(maxBytes / 1048576)} MB)`);
+  }
+
   const { data: sessionData } = await supabase.auth.getSession();
   const token = sessionData.session?.access_token;
   if (!token) throw new Error('Not authenticated');
 
   const supabaseUrl = (import.meta.env.VITE_SUPABASE_URL as string).replace(/\/+$/, '');
   const apikey = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
-  const url = `${supabaseUrl}/storage/v1/object/media/${opts.path}`;
+  const url = `${supabaseUrl}/storage/v1/object/media/${safeBucketPath(opts.path)}`;
   const contentType = opts.contentType ?? opts.file.type ?? 'application/octet-stream';
   const cacheControl = opts.cacheControl ?? 'public, max-age=3600';
 
@@ -63,8 +84,9 @@ export async function tryDeleteFromMediaBucket(path: string | undefined | null):
   if (!path) return;
   if (/^https?:\/\//i.test(path) || path.startsWith('/')) return;
   try {
-    await supabase.storage.from('media').remove([path]);
-  } catch {
-    // Orphaned file is harmless — swallow errors.
+    const { error } = await supabase.storage.from('media').remove([path]);
+    if (error) console.warn(`tryDeleteFromMediaBucket: failed to delete "${path}":`, error.message);
+  } catch (e) {
+    console.warn(`tryDeleteFromMediaBucket: error deleting "${path}":`, e);
   }
 }

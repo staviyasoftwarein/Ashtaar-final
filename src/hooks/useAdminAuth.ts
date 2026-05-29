@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
+import { clearSettingsCache } from './useSetting';
 import type { Session } from '@supabase/supabase-js';
 
 const USERNAME_TO_EMAIL: Record<string, string> = {
@@ -64,12 +65,17 @@ export function useAdminAuth(): AuthState & {
 
   const signIn = async (username: string, password: string) => {
     const email = usernameToEmail(username);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) throw error;
+    if (!isAdminSession(data.session)) {
+      await supabase.auth.signOut();
+      throw new Error('Not authorized: this account does not have admin access.');
+    }
   };
 
   const signOut = async () => {
     await supabase.auth.signOut();
+    clearSettingsCache();
   };
 
   return { ...state, signIn, signOut };

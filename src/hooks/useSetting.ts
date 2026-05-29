@@ -17,6 +17,11 @@ function emit(key: string, value: unknown) {
   subscribers.get(key)?.forEach((fn) => fn(value));
 }
 
+/** Drop all cached settings (e.g. on sign-out) so the next read hits the server. */
+export function clearSettingsCache() {
+  cache.clear();
+}
+
 export function useSetting<T>(key: string, fallback: T): {
   value: T;
   loading: boolean;
@@ -64,11 +69,14 @@ export function useSetting<T>(key: string, fallback: T): {
   }, [key]);
 
   const save = async (next: T) => {
-    const { error: err } = await supabase
+    const { data, error: err } = await supabase
       .from('site_settings')
-      .upsert({ key, value: next as never }, { onConflict: 'key' });
+      .upsert({ key, value: next as never }, { onConflict: 'key' })
+      .select('value')
+      .single();
     if (err) throw err;
-    emit(key, next);
+    // Emit the authoritative server value rather than the local draft.
+    emit(key, (data?.value as T | undefined) ?? next);
   };
 
   return { value, loading, error, save };
